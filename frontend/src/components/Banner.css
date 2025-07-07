@@ -1,0 +1,156 @@
+.banner {
+  height: 70vh;
+  background: linear-gradient(135deg, #6ba3d6 0%, #4a90c2 100%);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+}
+
+.banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop') center/cover;
+  opacity: 0.1;
+  z-index: 1;
+}
+
+.banner-overlay {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.banner-content {
+  text-align: center;
+  color: white;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.banner-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.banner-subtitle {
+  font-size: 1.3rem;
+  margin-bottom: 2.5rem;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+.banner-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Extra Large Desktop */
+@media (min-width: 1600px) {
+  .banner {
+    height: 75vh;
+    min-height: 600px;
+  }
+  
+  .banner-content {
+    max-width: 1000px;
+  }
+  
+  .banner-title {
+    font-size: 4.5rem;
+  }
+  
+  .banner-subtitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1200px) and (max-width: 1599px) {
+  .banner-title {
+    font-size: 4rem;
+  }
+  
+  .banner-subtitle {
+    font-size: 1.4rem;
+  }
+}
+
+/* Tablet Responsive */
+@media (max-width: 1199px) {
+  .banner {
+    height: 65vh;
+    min-height: 450px;
+  }
+  
+  .banner-title {
+    font-size: 3rem;
+  }
+  
+  .banner-subtitle {
+    font-size: 1.2rem;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .banner {
+    height: 60vh;
+    min-height: 400px;
+  }
+  
+  .banner-content {
+    padding: 0 15px;
+  }
+  
+  .banner-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .banner-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .banner-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  
+  .btn {
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .banner {
+    height: 55vh;
+    min-height: 350px;
+  }
+  
+  .banner-title {
+    font-size: 2rem;
+  }
+  
+  .banner-subtitle {
+    font-size: 1rem;
+  }
+  
+  .banner-content {
+    padding: 0 10px;
+  }
+}
