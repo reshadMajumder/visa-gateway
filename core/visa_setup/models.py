@@ -60,6 +60,7 @@ class Country(models.Model):
 
     # One-to-many: one VisaType to many Countries
     types = models.ManyToManyField(VisaType, related_name='countries')
+    active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

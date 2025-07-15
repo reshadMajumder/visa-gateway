@@ -15,9 +15,23 @@ class CountryView(APIView):
 
     """
 
-    def get(self, request):
+    def get(self, request, id=None):   
+        if id:
+            try:
+                country = Country.objects.filter(id=id, active=True).prefetch_related(
+                    'types'
+                ).first()
+                serializer = CountrySerializer(country)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response(
+                    {"error": "Failed to fetch country", "details": str(e)},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                ) 
         try:
-            countries = Country.objects.all()
+            countries = Country.objects.filter(active=True).prefetch_related(
+                'types'
+            )
             serializer = CountrySerializer(countries, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -49,7 +63,7 @@ class VisaTypeView(APIView):
                 visa_types = VisaType.objects.filter(active=True).prefetch_related(
                     'processes', 'overviews', 'notes', 'required_documents'
                 )
-                serializer = VisaTypeSerializer(visa_types, many=True)
+                serializer = DetailedVisaTypeSerializer(visa_types, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response(
@@ -58,5 +72,28 @@ class VisaTypeView(APIView):
                 )
 
 
-
+class CountryVisaTypesView(APIView):
+    """
+    get visa types by country
+    """
+    def get(self, request, id=None):
+        if not id:
+            return Response(
+                {"error": "Country ID is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            country = Country.objects.filter(id=id, active=True).prefetch_related(
+                'types'
+            ).first()
+            visa_types = country.types.filter(active=True).prefetch_related(
+                'processes', 'overviews', 'notes', 'required_documents'
+            )
+            serializer = DetailedVisaTypeSerializer(visa_types, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"error": "Failed to fetch visa types for the country", "details": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
