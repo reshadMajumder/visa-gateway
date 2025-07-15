@@ -22,7 +22,7 @@ class RequiredDocumentsSerializer(serializers.ModelSerializer):
         model = RequiredDocuments
         fields = '__all__'
 
-class VisaTypeSerializer(serializers.ModelSerializer):
+class DetailedVisaTypeSerializer(serializers.ModelSerializer):
     processes = visaProcessSerializer(many=True)
     overviews = VisaOverviewSerializer(many=True)
     notes = NotesSerializer(many=True)
@@ -32,11 +32,18 @@ class VisaTypeSerializer(serializers.ModelSerializer):
         model = VisaType
         fields = '__all__'
 
+class VisaTypeSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = VisaType
+        fields = ['id', 'name']
 
 class CountrySerializer(serializers.ModelSerializer):
     types = VisaTypeSerializer(many=True)
 
     class Meta:
         model = Country
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'code', 'types', 'created_at', 'updated_at']
+
+
+
