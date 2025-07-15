@@ -1,64 +1,37 @@
-import { useState } from 'react'
+import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import OTPVerification from './pages/OTPVerification'
 import CountryDetails from './pages/CountryDetails'
 import VisaDetails from './pages/VisaDetails'
 import About from './pages/About'
 import Gallery from './pages/Gallery'
 import Contact from './pages/Contact'
+import UserAccount from './pages/UserAccount'
+import AdminDashboard from './pages/admin/AdminDashboard'
 import Footer from './components/Footer'
 import './App.css'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home')
-  const [selectedCountry, setSelectedCountry] = useState(null)
-  const [selectedVisa, setSelectedVisa] = useState(null)
-
-  const handleNavigation = (page) => {
-    setCurrentPage(page)
-  }
-
-  const handleCountrySelect = (country) => {
-    setSelectedCountry(country)
-    setCurrentPage('country-details')
-  }
-
-  const handleVisaSelect = (visa, country) => {
-    setSelectedVisa({ ...visa, country })
-    setCurrentPage('visa-details')
-  }
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <Home onCountrySelect={handleCountrySelect} />
-      case 'country-details':
-        return <CountryDetails 
-          country={selectedCountry} 
-          onBack={() => setCurrentPage('home')}
-          onVisaSelect={handleVisaSelect}
-        />
-      case 'visa-details':
-        return <VisaDetails 
-          visa={selectedVisa} 
-          onBack={() => setCurrentPage('country-details')}
-        />
-      case 'about':
-        return <About />
-      case 'gallery':
-        return <Gallery />
-      case 'contact':
-        return <Contact />
-      default:
-        return <Home onCountrySelect={handleCountrySelect} />
-    }
-  }
-
   return (
     <div className="App">
-      <Navbar onNavigate={handleNavigation} currentPage={currentPage} />
+      <Navbar />
       <main>
-        {renderPage()}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
+          <Route path="/country/:countryId" element={<CountryDetails />} />
+          <Route path="/visa/:countryId/:visaId" element={<VisaDetails />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/account" element={<UserAccount />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Routes>
       </main>
       <Footer />
     </div>

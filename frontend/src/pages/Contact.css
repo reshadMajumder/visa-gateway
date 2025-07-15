@@ -22,7 +22,7 @@
 }
 
 .contact-info p {
-  color: #666;
+  color: #000;
   line-height: 1.8;
   margin-bottom: 2rem;
 }
@@ -40,7 +40,7 @@
 }
 
 .contact-item p {
-  color: #666;
+  color: #000;
   line-height: 1.6;
   margin: 0;
 }
@@ -48,7 +48,7 @@
 .contact-form {
   background: #f8f9fa;
   padding: 2.5rem;
-  border-radius: 12px;
+  border-radius: 4px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
@@ -82,7 +82,7 @@
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 16px;
   transition: border-color 0.3s ease;
   font-family: inherit;
@@ -107,7 +107,7 @@
   background: #2c5aa0;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;

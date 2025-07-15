@@ -2,9 +2,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+ 
 }
 
-body {
+main {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
   color: #333;
@@ -15,17 +16,23 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+   padding: 0 180px;
 }
 
 main {
   flex: 1;
 }
 
+/* Footer should take full width */
+.App > footer {
+   margin: 0 -180px;
+}
+
 /* Common styles */
 .container {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0;
   width: 100%;
 }
 
@@ -78,18 +85,44 @@ main {
 .section-subtitle {
   text-align: center;
   font-size: 1.2rem;
-  color: #666;
+  color: #000;
   margin-bottom: 50px;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }
 
+/* Fix spacing and padding issues */
+.section {
+  padding: 60px 0;
+}
+
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0;
+  width: 100%;
+}
+
+/* Ensure proper spacing for all sections */
+.countries-section,
+.visa-categories-section {
+  padding: 60px 0;
+}
+
 /* Extra Large Desktop Optimization */
 @media (min-width: 1600px) {
+  .App {
+    padding: 0 220px;
+  }
+  
+  .App > footer {
+    margin: 0 -220px;
+  }
+  
   .container {
     max-width: 1800px;
-    padding: 0 60px;
+    padding: 0;
   }
   
   .section {
@@ -108,9 +141,17 @@ main {
 
 /* Large Desktop Optimization */
 @media (min-width: 1400px) {
+  .App {
+    padding: 0 200px;
+  }
+  
+  .App > footer {
+    margin: 0 -200px;
+  }
+  
   .container {
     max-width: 1600px;
-    padding: 0 50px;
+    padding: 0;
   }
   
   .section {
@@ -129,17 +170,33 @@ main {
 
 /* Standard Desktop */
 @media (min-width: 1200px) and (max-width: 1399px) {
+  .App {
+    padding: 0 160px;
+  }
+  
+  .App > footer {
+    margin: 0 -160px;
+  }
+  
   .container {
     max-width: 1400px;
-    padding: 0 40px;
+    padding: 0;
   }
 }
 
 /* Tablet Responsive */
 @media (max-width: 1199px) {
+  .App {
+    padding: 0 80px;
+  }
+  
+  .App > footer {
+    margin: 0 -80px;
+  }
+  
   .container {
     max-width: 1200px;
-    padding: 0 30px;
+    padding: 0;
   }
   
   .section {
@@ -157,8 +214,16 @@ main {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .App {
+    padding: 0 40px;
+  }
+  
+  .App > footer {
+    margin: 0 -40px;
+  }
+  
   .container {
-    padding: 0 15px;
+    padding: 0;
   }
   
   .section-title {
@@ -183,10 +248,30 @@ main {
   }
 }
 
+/* Fix mobile padding issues */
+@media (max-width: 768px) {
+  .section {
+    padding: 40px 0;
+  }
+  
+  .countries-section,
+  .visa-categories-section {
+    padding: 40px 0;
+  }
+}
+
 /* Small Mobile */
 @media (max-width: 480px) {
+  .App {
+    padding: 0 20px;
+  }
+  
+  .App > footer {
+    margin: 0 -20px;
+  }
+  
   .container {
-    padding: 0 10px;
+    padding: 0;
   }
   
   .section-title {

@@ -71,7 +71,7 @@
 
 .visa-category-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -159,12 +159,12 @@
 
 .visa-duration {
   font-size: 1.2rem;
-  color: #666;
+  color: #000;
   font-weight: 600;
 }
 
 .visa-card-description {
-  color: #666;
+  color: #000;
   margin-bottom: 1.5rem;
   line-height: 1.6;
   font-size: 0.95rem;
@@ -299,13 +299,15 @@
 /* Mobile - 2 columns as requested */
 @media (max-width: 599px) {
   .visa-categories-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     margin-top: 2rem;
+    padding: 0;
   }
   
   .visa-category-card {
     margin: 0;
+    max-width: 100%;
   }
   
   .visa-card-image {
@@ -319,16 +321,19 @@
   .visa-card-title {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
+    color: #1e3a5f;
   }
   
   .visa-duration {
     font-size: 1rem;
+    color: #4a5568;
   }
   
   .visa-card-description {
     font-size: 0.8rem;
     margin-bottom: 1rem;
     line-height: 1.4;
+    color: #4a5568;
   }
   
   .visa-features {
@@ -339,11 +344,15 @@
   .visa-feature-tag {
     font-size: 0.7rem;
     padding: 4px 8px;
+    background: linear-gradient(135deg, #f7fafc, #edf2f7);
+    color: #1e3a5f;
+    border: 1px solid rgba(30, 58, 95, 0.15);
   }
   
   .visa-price-badge {
     font-size: 0.7rem;
     padding: 4px 8px;
+    background: linear-gradient(135deg, rgba(34, 139, 58, 0.95), rgba(25, 135, 84, 0.95));
   }
   
   .visa-card-footer {
@@ -355,20 +364,28 @@
   .processing-time-info {
     font-size: 0.8rem;
     justify-content: center;
+    color: #059669;
   }
   
   .visa-view-button {
     padding: 8px 12px;
     font-size: 0.8rem;
     width: 100%;
+    background: linear-gradient(135deg, #1e3a5f, #26547c);
   }
 }
 
 /* Small Mobile - still 2 columns but smaller */
 @media (max-width: 480px) {
   .visa-categories-grid {
-    gap: 0.8rem;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
     margin-top: 1.5rem;
+    padding: 0;
+  }
+  
+  .visa-category-card {
+    margin: 0;
   }
   
   .visa-card-image {
@@ -381,29 +398,37 @@
   
   .visa-card-title {
     font-size: 1rem;
+    color: #1e3a5f;
   }
   
   .visa-card-description {
     font-size: 0.75rem;
+    color: #4a5568;
   }
   
   .visa-feature-tag {
     font-size: 0.65rem;
     padding: 3px 6px;
+    background: linear-gradient(135deg, #f7fafc, #edf2f7);
+    color: #1e3a5f;
+    border: 1px solid rgba(30, 58, 95, 0.15);
   }
   
   .visa-price-badge {
     font-size: 0.65rem;
     padding: 3px 6px;
+    background: linear-gradient(135deg, rgba(34, 139, 58, 0.95), rgba(25, 135, 84, 0.95));
   }
   
   .processing-time-info {
     font-size: 0.75rem;
+    color: #059669;
   }
   
   .visa-view-button {
     font-size: 0.75rem;
     padding: 6px 10px;
+    background: linear-gradient(135deg, #1e3a5f, #26547c);
   }
 }
 

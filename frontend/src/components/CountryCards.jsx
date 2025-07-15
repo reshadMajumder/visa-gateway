@@ -1,9 +1,21 @@
+import { useNavigate } from 'react-router-dom'
 import './CountryCards.css'
 
-const CountryCards = ({ onCountrySelect }) => {
+const CountryCards = () => {
+  const navigate = useNavigate()
+
   const countries = [
     {
       id: 1,
+      name: 'Romania',
+      flag: '🇷🇴',
+      image: 'https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg?auto=compress&cs=tinysrgb&w=400',
+      description: 'Work visas with accommodation and competitive salaries',
+      processingTime: '7-12 months',
+      visaTypes: ['Work Visa', 'Delivery Rider', 'Construction Worker', 'Kitchen Helper']
+    },
+    {
+      id: 2,
       name: 'United States',
       flag: '🇺🇸',
       image: 'https://images.pexels.com/photos/290595/pexels-photo-290595.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -12,7 +24,7 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Tourist Visa', 'Business Visa', 'Student Visa', 'Work Visa']
     },
     {
-      id: 2,
+      id: 3,
       name: 'Canada',
       flag: '🇨🇦',
       image: 'https://images.pexels.com/photos/1680247/pexels-photo-1680247.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -21,7 +33,7 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Visitor Visa', 'Study Permit', 'Work Permit', 'Express Entry']
     },
     {
-      id: 3,
+      id: 4,
       name: 'United Kingdom',
       flag: '🇬🇧',
       image: 'https://images.pexels.com/photos/460672/pexels-photo-460672.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -30,7 +42,7 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Standard Visitor', 'Student Visa', 'Work Visa', 'Transit Visa']
     },
     {
-      id: 4,
+      id: 5,
       name: 'Australia',
       flag: '🇦🇺',
       image: 'https://images.pexels.com/photos/995765/pexels-photo-995765.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -39,7 +51,7 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Tourist Visa', 'Student Visa', 'Skilled Migration', 'Working Holiday']
     },
     {
-      id: 5,
+      id: 6,
       name: 'Germany',
       flag: '🇩🇪',
       image: 'https://images.pexels.com/photos/109629/pexels-photo-109629.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -48,7 +60,7 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Schengen Visa', 'Student Visa', 'Work Visa', 'Business Visa']
     },
     {
-      id: 6,
+      id: 7,
       name: 'France',
       flag: '🇫🇷',
       image: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -57,7 +69,7 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Tourist Visa', 'Business Visa', 'Long-stay Visa', 'Transit Visa']
     },
     {
-      id: 7,
+      id: 8,
       name: 'Japan',
       flag: '🇯🇵',
       image: 'https://images.pexels.com/photos/2506923/pexels-photo-2506923.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -66,7 +78,7 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Tourist Visa', 'Business Visa', 'Working Visa', 'Student Visa']
     },
     {
-      id: 8,
+      id: 9,
       name: 'Singapore',
       flag: '🇸🇬',
       image: 'https://images.pexels.com/photos/1134166/pexels-photo-1134166.jpeg?auto=compress&cs=tinysrgb&w=400',
@@ -75,6 +87,10 @@ const CountryCards = ({ onCountrySelect }) => {
       visaTypes: ['Tourist Visa', 'Business Visa', 'Employment Pass', 'Student Pass']
     }
   ]
+
+  const handleCountrySelect = (country) => {
+    navigate(`/country/${country.id}`, { state: { country } })
+  }
 
   return (
     <section className="countries-section section" id="countries">
@@ -89,7 +105,7 @@ const CountryCards = ({ onCountrySelect }) => {
             <div 
               key={country.id} 
               className="country-card"
-              onClick={() => onCountrySelect(country)}
+              onClick={() => handleCountrySelect(country)}
             >
               <div className="card-image">
                 <img src={country.image} alt={country.name} />

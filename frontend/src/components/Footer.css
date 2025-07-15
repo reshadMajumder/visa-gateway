@@ -26,7 +26,7 @@
 }
 
 .footer-section p {
-  color: #ccc;
+  color: #ddd;
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -64,7 +64,7 @@
 }
 
 .footer-section ul li a {
-  color: #ccc;
+  color: #ddd;
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -75,7 +75,7 @@
 
 .contact-info p {
   margin-bottom: 0.75rem;
-  color: #ccc;
+  color: #ddd;
 }
 
 .footer-bottom {
@@ -92,7 +92,7 @@
 }
 
 .footer-bottom p {
-  color: #ccc;
+  color: #ddd;
   margin: 0;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .footer-links a {
-  color: #ccc;
+  color: #ddd;
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.3s ease;

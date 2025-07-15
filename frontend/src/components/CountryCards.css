@@ -11,7 +11,7 @@
 
 .country-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 4px;
   overflow: hidden;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -103,7 +103,7 @@
 }
 
 .card-description {
-  color: #666;
+  color: #000;
   margin-bottom: 1.5rem;
   line-height: 1.6;
   font-size: 0.95rem;
@@ -135,7 +135,7 @@
 
 .visa-type-tag.more {
   background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
-  color: #666;
+  color: #000;
   border-color: rgba(102, 102, 102, 0.2);
 }
 
@@ -231,13 +231,15 @@
 /* Mobile - 2 columns as requested */
 @media (max-width: 599px) {
   .countries-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     margin-top: 2rem;
+    padding: 0;
   }
   
   .country-card {
     margin: 0;
+    max-width: 100%;
   }
   
   .card-image {
@@ -251,6 +253,7 @@
   .card-title {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
+    color: #1e3a5f;
   }
   
   .card-flag {
@@ -261,6 +264,7 @@
     font-size: 0.8rem;
     margin-bottom: 1rem;
     line-height: 1.4;
+    color: #4a5568;
   }
   
   .visa-types {
@@ -271,11 +275,15 @@
   .visa-type-tag {
     font-size: 0.7rem;
     padding: 4px 8px;
+    background: linear-gradient(135deg, #f7fafc, #edf2f7);
+    color: #1e3a5f;
+    border: 1px solid rgba(30, 58, 95, 0.15);
   }
   
   .processing-time {
     font-size: 0.7rem;
     padding: 4px 8px;
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.95), rgba(26, 54, 93, 0.95));
   }
   
   .card-footer {
@@ -286,14 +294,21 @@
     padding: 8px 12px;
     font-size: 0.8rem;
     width: 100%;
+    background: linear-gradient(135deg, #1e3a5f, #26547c);
   }
 }
 
 /* Small Mobile - still 2 columns but smaller */
 @media (max-width: 480px) {
   .countries-grid {
-    gap: 0.8rem;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
     margin-top: 1.5rem;
+    padding: 0;
+  }
+  
+  .country-card {
+    margin: 0;
   }
   
   .card-image {
@@ -306,24 +321,31 @@
   
   .card-title {
     font-size: 1rem;
+    color: #1e3a5f;
   }
   
   .card-description {
     font-size: 0.75rem;
+    color: #4a5568;
   }
   
   .visa-type-tag {
     font-size: 0.65rem;
     padding: 3px 6px;
+    background: linear-gradient(135deg, #f7fafc, #edf2f7);
+    color: #1e3a5f;
+    border: 1px solid rgba(30, 58, 95, 0.15);
   }
   
   .processing-time {
     font-size: 0.65rem;
     padding: 3px 6px;
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.95), rgba(26, 54, 93, 0.95));
   }
   
   .card-button {
     font-size: 0.75rem;
     padding: 6px 10px;
+    background: linear-gradient(135deg, #1e3a5f, #26547c);
   }
 }
