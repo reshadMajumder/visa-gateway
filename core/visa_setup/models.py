@@ -70,3 +70,20 @@ class Country(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+
+class VisaApplication(models.Model):
+    user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='visa_applications')
+    visa_type = models.ForeignKey(VisaType, on_delete=models.CASCADE, related_name='applications')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='applications')
+    status = models.CharField(max_length=50, default='pending', choices=[
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ])
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.email} - {self.visa_type.name} - {self.country.name}"
