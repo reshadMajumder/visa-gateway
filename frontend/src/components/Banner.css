@@ -1,0 +1,201 @@
+.banner {
+  height: 50vh;
+  background: linear-gradient(135deg, rgba(13, 39, 80, 0.9) 0%, rgba(30, 63, 115, 0.9) 100%);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 350px;
+}
+
+.banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://images.pexels.com/photos/3769146/pexels-photo-3769146.jpeg') center/cover;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.banner-overlay {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+  gap: 2rem;
+}
+
+.banner-left {
+  flex: 1;
+  max-width: 60%;
+}
+
+.banner-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  color: white;
+}
+
+.banner-subtitle {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+  line-height: 1.6;
+  max-width: 450px;
+}
+
+.banner-button {
+  display: inline-block;
+  padding: 12px 28px;
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.banner-button:hover {
+  background: white;
+  color: #0d2750;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.banner-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  max-width: 40%;
+}
+
+.banner-logo {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 2rem;
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.banner-logo-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.8rem;
+  color: #0d2750;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.banner-logo-text {
+  color: white;
+  margin: 0;
+}
+
+.banner-logo-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+
+.banner-logo-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+}
+
+.banner-logo-tagline {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .banner {
+    height: 40vh;
+    min-height: 300px;
+  }
+  
+  .banner-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .banner-left,
+  .banner-right {
+    max-width: 100%;
+  }
+  
+  .banner-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .banner-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .banner-button {
+    padding: 10px 20px;
+    font-size: 0.8rem;
+  }
+  
+  .banner-logo {
+    max-width: 250px;
+    padding: 1.5rem;
+  }
+  
+  .banner-logo-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .banner-logo-title {
+    font-size: 1.5rem;
+  }
+  
+  .banner-logo-subtitle {
+    font-size: 1rem;
+  }
+  
+  .banner-logo-tagline {
+    font-size: 0.7rem;
+  }
+}
