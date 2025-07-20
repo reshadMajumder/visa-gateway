@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 
 
 class Notes(models.Model):
@@ -24,9 +25,15 @@ class VisaOverview(models.Model):
 
 class RequiredDocuments(models.Model):
     document_name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.document_name
+    description = models.TextField(blank=True, help_text="Detailed description of the document requirements")
+    is_mandatory = models.BooleanField(default=True)
+    document_format = models.CharField(max_length=50, default="PDF", choices=[
+        ("PDF", "PDF File"),
+        ("IMAGE", "Image File (JPG, PNG)"),
+        ("DOC", "Word Document")
+    ])
+    max_file_size = models.IntegerField(default=5, help_text="Maximum file size in MB")
+    additional_instructions = models.TextField(blank=True)
 
 class VisaType(models.Model):
     name = models.CharField(max_length=100)
@@ -74,6 +81,14 @@ class Country(models.Model):
 
 
 class VisaApplication(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('submitted', 'Submitted'),
+        ('in_review', 'In Review'),
+        ('additional_docs_required', 'Additional Documents Required'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ]
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='visa_applications')
     visa_type = models.ForeignKey(VisaType, on_delete=models.CASCADE, related_name='applications')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='applications')
@@ -82,8 +97,34 @@ class VisaApplication(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected')
     ])
+    admin_notes = models.TextField(blank=True)
+    rejection_reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.email} - {self.visa_type.name} - {self.country.name}"
+
+class VisaTypeDocument(models.Model):
+    visa_type = models.ForeignKey(VisaType, on_delete=models.CASCADE)
+    document = models.ForeignKey(RequiredDocuments, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        ordering = ['order']
+        unique_together = ['visa_type', 'document']
+
+class ApplicationDocument(models.Model):
+    application = models.ForeignKey(VisaApplication, on_delete=models.CASCADE, related_name='documents')
+    required_document = models.ForeignKey(RequiredDocuments, on_delete=models.CASCADE)
+    file = models.FileField(
+        upload_to='visa_documents/%Y/%m/',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'])]
+    )
+    status = models.CharField(max_length=20, default='pending', choices=[
+        ('pending', 'Pending Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected')
+    ])
+    admin_notes = models.TextField(blank=True)
+    rejection_reason = models.TextField(blank=True)  # New field for rejection reason
