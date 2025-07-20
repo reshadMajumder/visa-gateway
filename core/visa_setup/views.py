@@ -29,7 +29,7 @@ class CountryView(APIView):
                         {"error": "Country not found"},
                         status=status.HTTP_404_NOT_FOUND
                     )
-                serializer = CountrySerializer(country)
+                serializer = CountrySerializer(country, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response(
@@ -40,7 +40,7 @@ class CountryView(APIView):
             countries = Country.objects.filter(active=True).prefetch_related(
                 'types'
             )
-            serializer = CountrySerializer(countries, many=True)
+            serializer = CountrySerializer(countries, many=True, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
@@ -67,7 +67,7 @@ class VisaTypeView(APIView):
                         {"error": "Visa type not found"},
                         status=status.HTTP_404_NOT_FOUND
                     )
-                serializer = DetailedVisaTypeSerializer(visa_type)
+                serializer = DetailedVisaTypeSerializer(visa_type, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response(
@@ -79,7 +79,7 @@ class VisaTypeView(APIView):
                 visa_types = VisaType.objects.filter(active=True).prefetch_related(
                     'processes', 'overviews', 'notes', 'required_documents'
                 )
-                serializer = DetailedVisaTypeSerializer(visa_types, many=True)
+                serializer = DetailedVisaTypeSerializer(visa_types, many=True, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response(

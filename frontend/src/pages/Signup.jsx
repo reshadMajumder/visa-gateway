@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { authService } from '../services/authService'
 import './Signup.css'
 
 const Signup = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -18,6 +20,7 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -42,14 +45,34 @@ const Signup = () => {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
+    setError('')
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match')
       setIsLoading(false)
-      console.log('Signup attempt:', formData)
-    }, 2000)
+      return
+    }
+
+    try {
+      const response = await authService.register(formData)
+      console.log('Registration successful:', response)
+      
+      // After successful registration, automatically log in
+      await authService.login({
+        email: formData.email,
+        password: formData.password
+      })
+      
+      navigate('/dashboard') // Redirect to dashboard after successful registration and login
+    } catch (err) {
+      setError(err.detail || Object.values(err)[0]?.[0] || 'Registration failed')
+      console.error('Registration error:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const countries = [
@@ -233,6 +256,12 @@ const Signup = () => {
                 Subscribe to our newsletter for visa updates and travel tips
               </label>
             </div>
+
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
             
             <button 
               type="submit" 

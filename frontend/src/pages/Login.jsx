@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { authService } from '../services/authService'
 import './Login.css'
 
 const Login = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -18,14 +21,21 @@ const Login = () => {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
+    setError('')
+    
+    try {
+      const response = await authService.login(formData)
+      console.log('Login successful:', response)
+      navigate('/dashboard') // Redirect to dashboard after successful login
+    } catch (err) {
+      setError(err.detail || 'Invalid email or password')
+      console.error('Login error:', err)
+    } finally {
       setIsLoading(false)
-      console.log('Login attempt:', formData)
-    }, 2000)
+    }
   }
 
   return (
@@ -85,6 +95,12 @@ const Login = () => {
                 </button>
               </div>
             </div>
+            
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
             
             <div className="forgot-password">
               <Link to="/forgot-password">Forgot Password?</Link>

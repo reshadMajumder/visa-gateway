@@ -31,23 +31,55 @@ class DetailedVisaTypeSerializer(serializers.ModelSerializer):
     overviews = VisaOverviewSerializer(many=True)
     notes = NotesSerializer(many=True)
     required_documents = RequiredDocumentsSerializer(many=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = VisaType
-        fields = '__all__'
+        fields = ['id', 'name', 'headings', 'active', 'image',
+                 'processes', 'overviews', 'notes', 'required_documents',
+                 'description', 'created_at', 'updated_at']
+
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
 class VisaTypeSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = VisaType
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'image']
+
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
 class CountrySerializer(serializers.ModelSerializer):
     types = VisaTypeSerializer(many=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Country
-        fields = ['id', 'name', 'description', 'code', 'types', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'image',
+                 'code', 'types', 'created_at', 'updated_at']
+
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+    
+
 
 
 

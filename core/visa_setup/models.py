@@ -39,6 +39,7 @@ class VisaType(models.Model):
     name = models.CharField(max_length=100)
     headings = models.TextField()
     active = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='visa_type_images/', null=True, blank=True)
 
     # Changed to ManyToMany for flexibility
     processes = models.ManyToManyField(VisaProcess, related_name='visa_types', blank=True)
@@ -64,6 +65,7 @@ class Country(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     code= models.CharField(max_length=10, unique=True)
+    image = models.ImageField(upload_to='country_images/', null=True, blank=True)
 
     # One-to-many: one VisaType to many Countries
     types = models.ManyToManyField(VisaType, related_name='countries')
