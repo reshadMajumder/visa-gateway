@@ -37,7 +37,7 @@ class DetailedVisaTypeSerializer(serializers.ModelSerializer):
         model = VisaType
         fields = ['id', 'name', 'headings', 'active', 'image',
                  'processes', 'overviews', 'notes', 'required_documents',
-                 'description', 'created_at', 'updated_at']
+                 'description','price','expected_processing_time', 'created_at', 'updated_at']
 
     def get_image(self, obj):
         if obj.image:
@@ -50,9 +50,10 @@ class DetailedVisaTypeSerializer(serializers.ModelSerializer):
 class VisaTypeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
+
     class Meta:
         model = VisaType
-        fields = ['id', 'name', 'image']
+        fields = ['id', 'name', 'image','headings','price']
 
     def get_image(self, obj):
         if obj.image:

@@ -48,6 +48,9 @@ class VisaType(models.Model):
     required_documents = models.ManyToManyField(RequiredDocuments, related_name='visa_types', blank=True)
 
     description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Price for processing the visa type")
+    expected_processing_time = models.CharField(max_length=10, blank=True, help_text="Expected processing time for the visa type")
+
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
