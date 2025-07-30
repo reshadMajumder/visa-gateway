@@ -162,11 +162,15 @@ class VisaApplicationView(APIView):
         except VisaApplication.DoesNotExist:
             return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        files = request.data.get('required_documents_files', [])
-        if not files:
+        files_json = request.data.get('required_documents_files', '')
+        if not files_json:
             return Response({"error": "No documents provided"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
+            # Parse the JSON string
+            import json
+            files = json.loads(files_json)
+            
             # Get required documents for this visa type
             required_docs = application.visa_type.required_documents.all()
             
@@ -189,7 +193,14 @@ class VisaApplicationView(APIView):
             # Create or update ApplicationDocument for each required document
             for file_info in files:
                 required_document_id = file_info['required_document_id']
-                file = file_info['file']
+                file_key = f"file_{required_document_id}"
+                file = request.FILES.get(file_key)
+                
+                if not file:
+                    return Response({
+                        "error": f"File not found for document ID {required_document_id}"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
                 required_document = RequiredDocuments.objects.get(id=required_document_id)
                 
                 # Check if document already exists
@@ -222,6 +233,10 @@ class VisaApplicationView(APIView):
                 "application": VisaApplicationSerializer(application).data
             }, status=status.HTTP_200_OK)
             
+        except json.JSONDecodeError:
+            return Response({
+                "error": "Invalid JSON format for required_documents_files"
+            }, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({
                 "error": "Failed to update application",
