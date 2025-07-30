@@ -8,6 +8,7 @@ const VisaDetails = () => {
   const navigate = useNavigate()
   
   const [visaDetails, setVisaDetails] = useState(null)
+  const [showApplyModal, setShowApplyModal] = useState(false)
   const country = location.state?.country || {
     id: parseInt(countryId),
     name: 'Country',
@@ -65,6 +66,43 @@ const VisaDetails = () => {
 
   const handleBack = () => {
     navigate(`/country/${countryId}`, { state: { country } })
+  }
+
+  const handleApplyNow = () => {
+    setShowApplyModal(true)
+  }
+
+  const handleApplyWithDocuments = () => {
+    setShowApplyModal(false)
+    navigate('/apply-with-documents', { state: { countryId: country.id, visaTypeId: parseInt(visaId) } })
+  }
+
+  const handleApplyWithoutDocuments = async () => {
+    setShowApplyModal(false)
+    
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/visa-applications/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          country_id: country.id,
+          visa_type_id: parseInt(visaId)
+          // No required_documents_files - creates draft application
+        })
+      })
+      
+      if (response.ok) {
+        alert('Application created successfully! You can upload documents later from your account.')
+        navigate('/account')
+      } else {
+        const errorData = await response.json()
+        alert(`Failed to create application: ${errorData.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      alert('Failed to create application. Please try again.')
+    }
   }
 
   if (!visaDetails) {
@@ -153,7 +191,7 @@ const VisaDetails = () => {
               </div>
               <div className="pricing-period">Per Application</div>
               
-              <button className="apply-now-button">
+              <button className="apply-now-button" onClick={handleApplyNow}>
                 Apply Now
               </button>
             </div>
@@ -170,6 +208,23 @@ const VisaDetails = () => {
           </div>
         </div>
       </div>
+
+      {showApplyModal && (
+        <div className="apply-modal-overlay">
+          <div className="apply-modal">
+            <h3>How do you want to apply?</h3>
+            <button className="modal-option-btn" onClick={handleApplyWithDocuments}>
+              Apply with Documents
+            </button>
+            <button className="modal-option-btn" onClick={handleApplyWithoutDocuments}>
+              Apply without Documents
+            </button>
+            <button className="modal-cancel-btn" onClick={() => setShowApplyModal(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

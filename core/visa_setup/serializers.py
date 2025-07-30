@@ -3,8 +3,7 @@ from rest_framework import serializers
 from accounts.serializers import UserSerializer
 from .models import (
     VisaType, Country, VisaProcess, VisaOverview, Notes, 
-    RequiredDocuments, VisaApplication, ApplicationDocument,
-    VisaTypeDocument
+    RequiredDocuments, VisaApplication, ApplicationDocument
 )
 
 class visaProcessSerializer(serializers.ModelSerializer):
@@ -85,30 +84,58 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 
-class ApplicationDocumentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ApplicationDocument
-        fields = '__all__'
 
 class VisaApplicationSerializer(serializers.ModelSerializer):
-    country = CountrySerializer(read_only=True)
-    visa_type = VisaTypeSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
+    country = serializers.SerializerMethodField()
+    visa_type = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
+    required_documents = serializers.SerializerMethodField()
     
     # Add these fields for write operations
     country_id = serializers.IntegerField(write_only=True)
     visa_type_id = serializers.IntegerField(write_only=True)
-    # Accept required documents and files on creation
-    required_documents_files = serializers.ListField(
-        child=serializers.DictField(),
-        write_only=True,
-        required=False
-    )
+    # Accept required documents and files on creation (optional)
+    required_documents_files = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = VisaApplication
-        fields = '__all__'
+        fields = ['id', 'country', 'visa_type', 'user', 'status', 'admin_notes', 
+                 'rejection_reason', 'created_at', 'updated_at', 'required_documents', 
+                 'country_id', 'visa_type_id', 'required_documents_files']
         read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+    def get_country(self, obj):
+        return {
+            'id': obj.country.id,
+            'name': obj.country.name,
+            'image': obj.country.image.url if obj.country.image else None
+        }
+
+    def get_visa_type(self, obj):
+        return {
+            'id': obj.visa_type.id,
+            'name': obj.visa_type.name,
+            'image': obj.visa_type.image.url if obj.visa_type.image else None
+        }
+
+    def get_user(self, obj):
+        return {
+            'id': obj.user.id,
+            'username': obj.user.username,
+            'full_name': obj.user.full_name
+        }
+
+    def get_required_documents(self, obj):
+        documents = []
+        for doc in obj.documents.all():
+            documents.append({
+                'id': doc.id,
+                'document_name': doc.required_document.document_name,
+                'status': doc.status,
+                'file': doc.file.url if doc.file else None,
+                'rejection_reason': doc.rejection_reason
+            })
+        return documents
 
     def validate(self, attrs):
         # Validate if country exists
@@ -129,21 +156,40 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
                 {"visa_type_id": "This visa type is not available for the selected country"}
             )
 
-        # Validate required documents and files
-        required_docs = visa_type.required_documents.all()
-        files = attrs.get('required_documents_files', [])
-        if self.instance is None:  # Only on create
-            if not files or len(files) != required_docs.count():
+        # Parse required_documents_files if provided
+        files_json = attrs.get('required_documents_files', '')
+        if files_json:
+            try:
+                import json
+                files = json.loads(files_json)
+                attrs['required_documents_files'] = files
+            except json.JSONDecodeError:
                 raise serializers.ValidationError({
-                    "required_documents_files": f"You must upload all required documents: {[doc.document_name for doc in required_docs]}"
+                    "required_documents_files": "Invalid JSON format for required_documents_files"
                 })
+        else:
+            attrs['required_documents_files'] = []
+
+        # Validate required documents and files (if provided)
+        files = attrs.get('required_documents_files', [])
+        if files:  # Only validate if files are provided
+            required_docs = visa_type.required_documents.all()
+            
+            if len(files) != required_docs.count():
+                raise serializers.ValidationError({
+                    "required_documents_files": f"You must upload all required documents. Expected {required_docs.count()} documents, got {len(files)}."
+                })
+            
             # Check that all required doc IDs are present
             file_doc_ids = {int(f['required_document_id']) for f in files if 'required_document_id' in f}
             required_doc_ids = {doc.id for doc in required_docs}
+            
             if file_doc_ids != required_doc_ids:
+                missing_docs = required_doc_ids - file_doc_ids
                 raise serializers.ValidationError({
-                    "required_documents_files": "You must upload a file for each required document."
+                    "required_documents_files": f"Missing required documents: {[RequiredDocuments.objects.get(id=doc_id).document_name for doc_id in missing_docs]}"
                 })
+        
         return attrs
 
     def create(self, validated_data):
@@ -151,25 +197,34 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
         country_id = validated_data.pop('country_id')
         visa_type_id = validated_data.pop('visa_type_id')
         files = validated_data.pop('required_documents_files', [])
+        
         country = Country.objects.get(id=country_id)
         visa_type = VisaType.objects.get(id=visa_type_id)
         user = self.context['request'].user
+        
+        # Determine status based on whether documents are provided
+        status = 'submitted' if files else 'draft'
+        
+        # Create the visa application
         visa_application = VisaApplication.objects.create(
             user=user,
             country=country,
             visa_type=visa_type,
+            status=status,
             **validated_data
         )
-        # Create ApplicationDocument for each required document
+        
+        # Create ApplicationDocument for each required document (if files provided)
         for file_info in files:
             required_document_id = file_info['required_document_id']
             file = file_info['file']
             required_document = RequiredDocuments.objects.get(id=required_document_id)
+            
             ApplicationDocument.objects.create(
                 application=visa_application,
                 required_document=required_document,
                 file=file,
                 status='pending'
             )
+        
         return visa_application
-
