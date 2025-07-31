@@ -26,19 +26,19 @@ class VisaOverview(models.Model):
 class RequiredDocuments(models.Model):
     document_name = models.CharField(max_length=100)
     description = models.TextField(blank=True, help_text="Detailed description of the document requirements")
-    is_mandatory = models.BooleanField(default=True)
-    document_format = models.CharField(max_length=50, default="PDF", choices=[
-        ("PDF", "PDF File"),
-        ("IMAGE", "Image File (JPG, PNG)"),
-        ("DOC", "Word Document")
-    ])
-    max_file_size = models.IntegerField(default=5, help_text="Maximum file size in MB")
-    additional_instructions = models.TextField(blank=True)
+    document_file=models.FileField(upload_to='visa_documents/%Y/%m/', null=True, blank=True ,validators =[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'])])
+    created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True,null=True, blank=True)
+    def __str__(self):
+        return self.document_name
+
+
 
 class VisaType(models.Model):
     name = models.CharField(max_length=100)
     headings = models.TextField()
     active = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='visa_type_images/', null=True, blank=True)
 
     # Changed to ManyToMany for flexibility
     processes = models.ManyToManyField(VisaProcess, related_name='visa_types', blank=True)
@@ -47,6 +47,9 @@ class VisaType(models.Model):
     required_documents = models.ManyToManyField(RequiredDocuments, related_name='visa_types', blank=True)
 
     description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Price for processing the visa type")
+    expected_processing_time = models.CharField(max_length=10, blank=True, help_text="Expected processing time for the visa type")
+
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -64,6 +67,7 @@ class Country(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     code= models.CharField(max_length=10, unique=True)
+    image = models.ImageField(upload_to='country_images/', null=True, blank=True)
 
     # One-to-many: one VisaType to many Countries
     types = models.ManyToManyField(VisaType, related_name='countries')
@@ -92,11 +96,7 @@ class VisaApplication(models.Model):
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='visa_applications')
     visa_type = models.ForeignKey(VisaType, on_delete=models.CASCADE, related_name='applications')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='applications')
-    status = models.CharField(max_length=50, default='pending', choices=[
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected')
-    ])
+    status = models.CharField(max_length=50, default='draft', choices=STATUS_CHOICES)
     admin_notes = models.TextField(blank=True)
     rejection_reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -105,14 +105,6 @@ class VisaApplication(models.Model):
     def __str__(self):
         return f"{self.user.email} - {self.visa_type.name} - {self.country.name}"
 
-class VisaTypeDocument(models.Model):
-    visa_type = models.ForeignKey(VisaType, on_delete=models.CASCADE)
-    document = models.ForeignKey(RequiredDocuments, on_delete=models.CASCADE)
-    order = models.PositiveIntegerField(default=0)
-    
-    class Meta:
-        ordering = ['order']
-        unique_together = ['visa_type', 'document']
 
 class ApplicationDocument(models.Model):
     application = models.ForeignKey(VisaApplication, on_delete=models.CASCADE, related_name='documents')
@@ -127,4 +119,13 @@ class ApplicationDocument(models.Model):
         ('rejected', 'Rejected')
     ])
     admin_notes = models.TextField(blank=True)
-    rejection_reason = models.TextField(blank=True)  # New field for rejection reason
+    rejection_reason = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.application.id} - {self.required_document.document_name}"
+
+    class Meta:
+        unique_together = ['application', 'required_document']
+

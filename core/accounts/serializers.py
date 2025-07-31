@@ -166,3 +166,9 @@ class UserSerializer(serializers.ModelSerializer):
                  'date_of_birth', 'address', 'profile_picture', 'is_active',
                  'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at', 'updated_at')
+
+
+class UserResponseSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        fields = ('id', 'email', 'username', 'full_name','profile_picture')
+        read_only_fields = ('id','email', 'username', 'full_name','profile_picture')

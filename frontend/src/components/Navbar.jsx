@@ -1,14 +1,52 @@
-import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import './Navbar.css'
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isCountriesDropdownOpen, setIsCountriesDropdownOpen] = useState(false)
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState(null)
   const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Check if user is authenticated on component mount
+    const accessToken = localStorage.getItem('accessToken')
+    const userData = localStorage.getItem('user')
+    
+    if (accessToken && userData) {
+      setIsAuthenticated(true)
+      setUser(JSON.parse(userData))
+    }
+  }, [])
 
   const isActive = (path) => {
     return location.pathname === path
+  }
+
+  const handleLogout = () => {
+    const refreshToken = localStorage.getItem('refreshToken')
+    
+    // Call logout API
+    fetch('http://127.0.0.1:8000/api/accounts/logout/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      body: JSON.stringify({ refresh_token: refreshToken })
+    }).finally(() => {
+      // Clear localStorage and state regardless of API response
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      localStorage.removeItem('user')
+      setIsAuthenticated(false)
+      setUser(null)
+      setIsProfileDropdownOpen(false)
+      navigate('/')
+    })
   }
 
   const countries = [
@@ -29,6 +67,7 @@ const Navbar = () => {
     // Navigate to country page
     window.location.href = `/country/${country.id}`
   }
+
   return (
     <>
       {/* Top Navbar - Logo and Auth */}
@@ -46,13 +85,54 @@ const Navbar = () => {
             </div>
             
             <div className="auth-section">
-              <Link to="/login" className="auth-link login">
-                LOG IN
-              </Link>
-              <span className="separator">|</span>
-              <Link to="/signup" className="auth-link signup">
-                SIGN UP
-              </Link>
+              {isAuthenticated ? (
+                <div className="profile-dropdown">
+                  <button 
+                    className="profile-button"
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  >
+                    <div className="profile-avatar">
+                      {user?.full_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
+                    </div>
+                    <span className="profile-name">{user?.full_name || user?.username}</span>
+                    <span className="dropdown-arrow">▼</span>
+                  </button>
+                  {isProfileDropdownOpen && (
+                    <div className="profile-dropdown-menu">
+                      <Link 
+                        to="/account" 
+                        className="dropdown-item"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        My Profile
+                      </Link>
+                      <Link 
+                        to="/account" 
+                        className="dropdown-item"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        My Applications
+                      </Link>
+                      <button 
+                        className="dropdown-item logout-btn"
+                        onClick={handleLogout}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" className="auth-link login">
+                    LOG IN
+                  </Link>
+                  <span className="separator">|</span>
+                  <Link to="/signup" className="auth-link signup">
+                    SIGN UP
+                  </Link>
+                </>
+              )}
             </div>
             
             {/* Mobile toggle button */}
@@ -104,7 +184,8 @@ const Navbar = () => {
                       className="dropdown-item"
                       onClick={() => handleCountrySelect(country)}
                     >
-                      {country.flag} {country.name}
+                      <span className="country-flag">{country.flag}</span>
+                      {country.name}
                     </button>
                   ))}
                 </div>
@@ -126,31 +207,15 @@ const Navbar = () => {
                 CONTACT
               </Link>
               
-              <Link 
-                to="/account" 
-                className={`nav-link ${isActive('/account') ? 'active' : ''}`}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                MY ACCOUNT
-              </Link>
-              
-              {/* Mobile auth section */}
-              <div className="mobile-auth-section">
+              {isAuthenticated && (
                 <Link 
-                  to="/login" 
-                  className="mobile-auth-link login"
+                  to="/account" 
+                  className={`nav-link ${isActive('/account') ? 'active' : ''}`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  LOG IN
+                  MY ACCOUNT
                 </Link>
-                <Link 
-                  to="/signup" 
-                  className="mobile-auth-link signup"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  SIGN UP
-                </Link>
-              </div>
+              )}
             </div>
           </div>
         </div>
