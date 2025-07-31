@@ -112,10 +112,19 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
         }
 
     def get_visa_type(self, obj):
+        required_documents = []
+        for doc in obj.visa_type.required_documents.all():
+            required_documents.append({
+                'id': doc.id,
+                'document_name': doc.document_name,
+                'description': doc.description
+            })
+        
         return {
             'id': obj.visa_type.id,
             'name': obj.visa_type.name,
-            'image': obj.visa_type.image.url if obj.visa_type.image else None
+            'image': obj.visa_type.image.url if obj.visa_type.image else None,
+            'required_documents': required_documents
         }
 
     def get_user(self, obj):
@@ -124,6 +133,7 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
             'username': obj.user.username,
             'full_name': obj.user.full_name
         }
+        
 
     def get_required_documents(self, obj):
         documents = []
@@ -228,3 +238,52 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
             )
         
         return visa_application
+
+
+
+
+class UserVisaApplicationSerializer(serializers.ModelSerializer):
+    country = serializers.SerializerMethodField()
+    visa_type = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VisaApplication
+        # fields = ['id', 'country', 'visa_type', 'user', 'status', 'admin_notes', 
+        #          'rejection_reason', 'created_at', 'updated_at', 'required_documents', 
+        #          'country_id', 'visa_type_id', 'required_documents_files']
+        # read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        fields='__all__'
+    def get_country(self, obj):
+        return {
+            'id': obj.country.id,
+            'name': obj.country.name,
+            'image': obj.country.image.url if obj.country.image else None
+        }
+
+    def get_visa_type(self, obj):
+        required_documents = []
+        for doc in obj.visa_type.required_documents.all():
+            required_documents.append({
+                'id': doc.id,
+                'document_name': doc.document_name,
+                'description': doc.description,
+                'document_file': doc.document_file.url if doc.document_file else None
+            })
+        
+        return {
+            'id': obj.visa_type.id,
+            'name': obj.visa_type.name,
+            'image': obj.visa_type.image.url if obj.visa_type.image else None,
+            'required_documents': required_documents
+        }
+
+    def get_user(self, obj):
+        return {
+            'id': obj.user.id,
+            'username': obj.user.username,
+        }
+        
+
+
+    

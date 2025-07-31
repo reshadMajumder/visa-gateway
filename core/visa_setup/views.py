@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .serializers import VisaTypeSerializer, CountrySerializer, DetailedVisaTypeSerializer, VisaApplicationSerializer
+from .serializers import VisaTypeSerializer, CountrySerializer, DetailedVisaTypeSerializer, VisaApplicationSerializer,UserVisaApplicationSerializer
 from .models import VisaType, Country, VisaApplication, RequiredDocuments, ApplicationDocument
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -267,5 +267,34 @@ class VisaApplicationView(APIView):
                 'country', 'visa_type', 'user'
             ).prefetch_related('documents__required_document')
             serializer = VisaApplicationSerializer(visa_applications, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"message":"Applications fetched successfully", "Applications:":serializer.data}, status=status.HTTP_200_OK)
 
+
+
+class UserVisaApplicationView(APIView):
+
+    def get(self, request, application_id=None):
+        """Get all visa applications or specific application for the logged-in user with documents"""
+        if application_id:
+            try:
+                visa_application = VisaApplication.objects.filter(
+                    id=application_id, 
+                    user=request.user
+                ).select_related(
+                    'country', 'visa_type', 'user'
+                ).prefetch_related('documents__required_document').first()
+                
+                if not visa_application:
+                    return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
+                
+                serializer = UserVisaApplicationSerializer(visa_application)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            """Get all visa applications for the logged-in user with documents"""
+            visa_applications = VisaApplication.objects.filter(user=request.user).select_related(
+                'country', 'visa_type', 'user'
+            ).prefetch_related('documents__required_document')
+            serializer = UserVisaApplicationSerializer(visa_applications, many=True)
+            return Response({"message":"Applications fetched successfully", "Applications:":serializer.data}, status=status.HTTP_200_OK)
