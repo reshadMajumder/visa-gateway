@@ -241,19 +241,25 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
 
 
 
-
 class UserVisaApplicationSerializer(serializers.ModelSerializer):
-    country = serializers.SerializerMethodField()
-    visa_type = serializers.SerializerMethodField()
-    user = serializers.SerializerMethodField()
+    # Read-only detailed views
+    country = serializers.SerializerMethodField(read_only=True)
+    visa_type = serializers.SerializerMethodField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
+
+    # Write-only fields for input
+    country_id = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), write_only=True)
+    visa_type_id = serializers.PrimaryKeyRelatedField(queryset=VisaType.objects.all(), write_only=True)
 
     class Meta:
         model = VisaApplication
-        # fields = ['id', 'country', 'visa_type', 'user', 'status', 'admin_notes', 
-        #          'rejection_reason', 'created_at', 'updated_at', 'required_documents', 
-        #          'country_id', 'visa_type_id', 'required_documents_files']
-        # read_only_fields = ['id', 'user', 'created_at', 'updated_at']
-        fields='__all__'
+        fields = [
+            'id', 'country', 'country_id', 'visa_type', 'visa_type_id', 'user',
+            'status', 'admin_notes', 'rejection_reason',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
     def get_country(self, obj):
         return {
             'id': obj.country.id,
@@ -263,14 +269,21 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
 
     def get_visa_type(self, obj):
         required_documents = []
+        uploaded_docs = {
+            doc.required_document.id: doc for doc in obj.documents.all()
+        }
+
         for doc in obj.visa_type.required_documents.all():
+            uploaded = uploaded_docs.get(doc.id)
             required_documents.append({
                 'id': doc.id,
                 'document_name': doc.document_name,
                 'description': doc.description,
-                'document_file': doc.document_file.url if doc.document_file else None
+                'document_file': uploaded.file.url if uploaded and uploaded.file else None,
+                'status': uploaded.status if uploaded else 'not_uploaded',
+                'admin_notes': uploaded.admin_notes if uploaded else '',
             })
-        
+
         return {
             'id': obj.visa_type.id,
             'name': obj.visa_type.name,
@@ -283,7 +296,35 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
             'id': obj.user.id,
             'username': obj.user.username,
         }
-        
 
+    def create(self, validated_data):
+        request = self.context['request']
+        user = request.user
 
-    
+        country = validated_data.pop('country_id')
+        visa_type = validated_data.pop('visa_type_id')
+
+        application = VisaApplication.objects.create(
+            user=user,
+            country=country,
+            visa_type=visa_type,
+            status=validated_data.get('status', 'draft'),
+            admin_notes=validated_data.get('admin_notes', ''),
+            rejection_reason=validated_data.get('rejection_reason', ''),
+        )
+
+        # Handle uploaded files
+        for key, file in request.FILES.items():
+            if key.startswith("required_documents["):
+                doc_id = key.split("[")[1].split("]")[0]
+                try:
+                    required_doc = RequiredDocuments.objects.get(id=doc_id)
+                    ApplicationDocument.objects.create(
+                        application=application,
+                        required_document=required_doc,
+                        file=file
+                    )
+                except RequiredDocuments.DoesNotExist:
+                    continue
+
+        return application

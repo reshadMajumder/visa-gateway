@@ -272,6 +272,8 @@ class VisaApplicationView(APIView):
 
 
 class UserVisaApplicationView(APIView):
+    permission_classes = (IsAuthenticated,)
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, application_id=None):
         """Get all visa applications or specific application for the logged-in user with documents"""
@@ -298,3 +300,58 @@ class UserVisaApplicationView(APIView):
             ).prefetch_related('documents__required_document')
             serializer = UserVisaApplicationSerializer(visa_applications, many=True)
             return Response({"message":"Applications fetched successfully", "Applications:":serializer.data}, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = UserVisaApplicationSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            visa_application = serializer.save()
+            return Response({
+                "message": "Application created successfully",
+                "Application": UserVisaApplicationSerializer(visa_application).data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, application_id=None):
+        try:
+            app = VisaApplication.objects.get(pk=application_id, user=request.user)
+        except VisaApplication.DoesNotExist:
+            return Response({'error': 'Application not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        updated = False
+
+        for key in request.FILES:
+            if key.startswith("required_documents["):
+                try:
+                    doc_id = int(key.split("[")[1].split("]")[0])
+                except (IndexError, ValueError):
+                    continue  # skip invalid keys
+
+                file = request.FILES[key]
+
+                try:
+                    required_doc = RequiredDocuments.objects.get(id=doc_id)
+                except RequiredDocuments.DoesNotExist:
+                    return Response({'error': f'Required document with ID {doc_id} does not exist'}, status=404)
+
+                # Update or create ApplicationDocument
+                app_doc, created = ApplicationDocument.objects.get_or_create(
+                    application=app,
+                    required_document=required_doc,
+                    defaults={'file': file}
+                )
+
+                if not created:
+                    app_doc.file = file
+                    app_doc.status = 'pending'  # Reset status after upload
+                    app_doc.admin_notes = ''
+                    app_doc.rejection_reason = ''
+                    app_doc.save()
+
+                updated = True
+
+        if updated:
+            return Response({'message': 'Document(s) updated successfully'}, status=200)
+        else:
+            return Response({'error': 'No valid document found to update'}, status=400)
+
+
