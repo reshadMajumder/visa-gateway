@@ -60,8 +60,8 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
   const getMissingDocuments = () => {
     if (!application.visa_type.required_documents) return []
     
-    const uploadedDocIds = application.required_documents?.map(doc => doc.required_document_id) || []
-    return application.visa_type.required_documents.filter(doc => !uploadedDocIds.includes(doc.id))
+    // Find documents that don't have a document_file uploaded
+    return application.visa_type.required_documents.filter(doc => !doc.document_file)
   }
 
   // Check if application needs document updates (draft, missing docs, or rejected)
@@ -90,7 +90,7 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
       const accessToken = localStorage.getItem('accessToken')
       const formData = new FormData()
       
-      // Add application IDs
+      // Add required fields for v2 API
       formData.append('visa_type_id', application.visa_type.id.toString())
       formData.append('country_id', application.country.id.toString())
       
@@ -99,22 +99,16 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
         ? application.visa_type.required_documents 
         : getMissingDocuments()
       
-      // Create the required_documents_files JSON
-      const documentsArray = documentsToUpload.map(doc => ({
-        required_document_id: doc.id
-      }))
-      formData.append('required_documents_files', JSON.stringify(documentsArray))
-      
-      // Add files
+      // Add files using the new format: required_documents[document_id]
       documentsToUpload.forEach(doc => {
         const file = selectedFiles[doc.id]
         if (file) {
-          formData.append(`file_${doc.id}`, file)
+          formData.append(`required_documents[${doc.id}]`, file)
         }
       })
 
-      const response = await fetch(`http://127.0.0.1:8000/api/visa-applications/${application.id}/`, {
-        method: 'PATCH',
+      const response = await fetch(`http://127.0.0.1:8000/api/v2/visa-applications/${application.id}/`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
@@ -122,20 +116,23 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
       })
 
       if (response.ok) {
+        const result = await response.json()
         setSelectedFiles({})
         setUploadError('')
         setShowUploadSection(false)
         onUploadSuccess && onUploadSuccess()
-        const successMessage = application.status === 'draft' 
+        
+        // Show success message from API response
+        const successMessage = result.message || (application.status === 'draft' 
           ? 'Documents uploaded successfully! Application status updated to submitted.'
-          : 'Documents updated successfully!'
+          : 'Documents updated successfully!')
         alert(successMessage)
       } else if (response.status === 401) {
         setUploadError('Session expired. Please login again.')
         onUploadError && onUploadError('Session expired. Please login again.')
       } else {
         const errorData = await response.json()
-        const errorMessage = errorData.error || 'Failed to upload documents'
+        const errorMessage = errorData.error || errorData.message || 'Failed to upload documents'
         setUploadError(errorMessage)
         onUploadError && onUploadError(errorMessage)
       }
@@ -207,10 +204,10 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
       </div>
 
       {/* Show uploaded documents count */}
-      {application.required_documents && application.required_documents.length > 0 && (
+      {application.visa_type.required_documents && application.visa_type.required_documents.length > 0 && (
         <div className="documents-summary">
           <span className="documents-count">
-            📎 {application.required_documents.length} document{application.required_documents.length !== 1 ? 's' : ''} uploaded
+            📎 {application.visa_type.required_documents.filter(doc => doc.document_file).length} of {application.visa_type.required_documents.length} document{application.visa_type.required_documents.length !== 1 ? 's' : ''} uploaded
           </span>
         </div>
       )}

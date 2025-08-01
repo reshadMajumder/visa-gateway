@@ -24,7 +24,7 @@ const UserVisaDetails = () => {
         return
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/api/visa-applications/${applicationId}/`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/v2/visa-applications/${applicationId}/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -215,11 +215,11 @@ const UserVisaDetails = () => {
                 </div>
               )}
 
-              {application.required_documents && application.required_documents.length > 0 && (
+              {application.visa_type.required_documents && application.visa_type.required_documents.length > 0 && (
                 <div className="detail-section">
                   <h2>Uploaded Documents</h2>
                   <div className="documents-grid">
-                    {application.required_documents.map((doc) => (
+                    {application.visa_type.required_documents.map((doc) => (
                       <div key={doc.id} className="document-card">
                         <div className="document-header">
                           <span className="document-name">{doc.document_name}</span>
@@ -230,9 +230,9 @@ const UserVisaDetails = () => {
                             {doc.status}
                           </span>
                         </div>
-                        {doc.file && (
+                        {doc.document_file && (
                           <a 
-                            href={`http://127.0.0.1:8000${doc.file}`} 
+                            href={`http://127.0.0.1:8000${doc.document_file}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="document-link"

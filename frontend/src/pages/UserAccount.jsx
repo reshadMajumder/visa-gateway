@@ -89,7 +89,7 @@ const UserAccount = () => {
         return
       }
 
-      const response = await fetch('http://127.0.0.1:8000/api/visa-applications/', {
+      const response = await fetch('http://127.0.0.1:8000/api/v2/visa-applications/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -99,6 +99,7 @@ const UserAccount = () => {
 
       if (response.ok) {
         const data = await response.json()
+        // Handle the new response structure where applications are under "Applications:" key
         setApplications(data['Applications:'] || [])
       } else if (response.status === 401) {
         // Token expired, try to refresh
