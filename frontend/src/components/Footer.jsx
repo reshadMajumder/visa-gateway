@@ -1,6 +1,21 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Footer.css'
 
 const Footer = () => {
+  const [countries, setCountries] = useState([])
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/countries/')
+      .then(response => response.json())
+      .then(data => {
+        setCountries(data.slice(0, 5)) // Get only first 5 countries
+      })
+      .catch(error => {
+        console.error('Error fetching countries:', error)
+      })
+  }, [])
   return (
     <footer className="footer">
       <div className="container">
@@ -33,11 +48,19 @@ const Footer = () => {
           <div className="footer-section">
             <h4>Popular Countries</h4>
             <ul>
-              <li><a href="#usa">United States</a></li>
-              <li><a href="#canada">Canada</a></li>
-              <li><a href="#uk">United Kingdom</a></li>
-              <li><a href="#australia">Australia</a></li>
-              <li><a href="#germany">Germany</a></li>
+              {countries.map(country => (
+                <li key={country.id}>
+                  <a 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault()
+                      navigate(`/country/${country.id}`, { state: { country } })
+                    }}
+                  >
+                    {country.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
           

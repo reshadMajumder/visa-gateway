@@ -8,8 +8,21 @@ const Navbar = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
+  const [countries, setCountries] = useState([])
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    // Fetch countries from API
+    fetch('http://127.0.0.1:8000/api/countries/')
+      .then(response => response.json())
+      .then(data => {
+        setCountries(data)
+      })
+      .catch(error => {
+        console.error('Error fetching countries:', error)
+      })
+  }, [])
 
   useEffect(() => {
     // Check if user is authenticated on component mount
@@ -49,23 +62,19 @@ const Navbar = () => {
     })
   }
 
-  const countries = [
-    { name: 'Romania', flag: '🇷🇴', id: 1 },
-    { name: 'United States', flag: '🇺🇸', id: 2 },
-    { name: 'Canada', flag: '🇨🇦', id: 3 },
-    { name: 'United Kingdom', flag: '🇬🇧', id: 4 },
-    { name: 'Australia', flag: '🇦🇺', id: 5 },
-    { name: 'Germany', flag: '🇩🇪', id: 6 },
-    { name: 'France', flag: '🇫🇷', id: 7 },
-    { name: 'Japan', flag: '🇯🇵', id: 8 },
-    { name: 'Singapore', flag: '🇸🇬', id: 9 }
-  ]
+  const getCountryFlag = (code) => {
+    // Convert country code to flag emoji
+    const codePoints = code
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt())
+    return String.fromCodePoint(...codePoints)
+  }
 
   const handleCountrySelect = (country) => {
     setIsCountriesDropdownOpen(false)
     setIsMobileMenuOpen(false)
-    // Navigate to country page
-    window.location.href = `/country/${country.id}`
+    navigate(`/country/${country.id}`, { state: { country } })
   }
 
   return (
@@ -184,7 +193,7 @@ const Navbar = () => {
                       className="dropdown-item"
                       onClick={() => handleCountrySelect(country)}
                     >
-                      <span className="country-flag">{country.flag}</span>
+                      <span className="country-flag">{getCountryFlag(country.code)}</span>
                       {country.name}
                     </button>
                   ))}
