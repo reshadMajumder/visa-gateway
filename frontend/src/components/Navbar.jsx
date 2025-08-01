@@ -131,15 +131,12 @@ const Navbar = () => {
       <div className="top-navbar">
         <div className="container">
           <div className="top-nav-content">
-            <div className="nav-logo">
+            {/* <div className="nav-logo"> */}
               <Link to="/">
-                <div className="nav-logo-icon">✈️</div>
-                <div>
-                  <h2>VisaGlobal</h2>
-                  <span className="tagline">One World, One Visa</span>
-                </div>
+                <img src='/logo.png' alt="VisaGlobal" style={{width:'50px', objectFit: 'cover'}}/>
               </Link>
-            </div>
+            {/* </div> */}
+
             
             <div className="auth-section">
               {isAuthenticated ? (

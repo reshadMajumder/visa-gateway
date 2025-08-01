@@ -1,22 +1,50 @@
-.visa-details-page {
-  min-height: 100vh;
+/* Loading State */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
 }
 
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #2c5aa0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hero Section */
 .visa-hero {
-  height: 50vh;
+  background: linear-gradient(135deg, #2c5aa0 0%, #1e3f73 100%);
+  color: white;
+  padding: 4rem 0 5rem;
   position: relative;
   overflow: hidden;
-  min-height: 300px;
-  background: linear-gradient(135deg, #2c5aa0 0%, #1e3f73 100%);
-  display: flex;
-  align-items: center;
-  color: white;
+}
+
+.visa-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  opacity: 0.3;
 }
 
 .visa-hero-content {
   position: relative;
   z-index: 2;
-  width: 100%;
 }
 
 .visa-back-button {
@@ -26,11 +54,14 @@
   padding: 12px 24px;
   border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   transition: all 0.3s ease;
   font-size: 14px;
   font-weight: 600;
   backdrop-filter: blur(10px);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .visa-back-button:hover {
@@ -39,24 +70,81 @@
   transform: translateX(-5px);
 }
 
-.visa-hero-title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.visa-hero-main {
+  max-width: 800px;
 }
 
-.visa-hero-icon {
-  font-size: 3.5rem;
+.visa-hero-info {
+  text-align: center;
+}
+
+.visa-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.country-flag {
+  font-size: 1.2rem;
+}
+
+.country-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.visa-hero-title {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .visa-hero-subtitle {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   opacity: 0.9;
+  line-height: 1.6;
 }
 
+/* Breadcrumbs */
+.breadcrumbs {
+  background: #f8f9fa;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.breadcrumb-item {
+  color: #6c757d;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb-item:hover {
+  color: #2c5aa0;
+}
+
+.breadcrumb-item.active {
+  color: #2c5aa0;
+  font-weight: 600;
+}
+
+.breadcrumb-separator {
+  color: #adb5bd;
+}
+
+/* Main Content */
 .visa-details-content {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -66,68 +154,115 @@
 
 .visa-main-info {
   background: white;
-  border-radius: 4px;
+  border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(44, 90, 160, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
 }
 
 .visa-info-section {
-  margin-bottom: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 .visa-info-section:last-child {
   margin-bottom: 0;
 }
 
-.visa-info-title {
-  color: #2c5aa0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
+.section-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.visa-info-title::before {
-  content: '★';
-  background: linear-gradient(135deg, #2c5aa0, #1e3f73);
-  color: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-}
-
-.visa-description-text {
-  color: #000;
-  line-height: 1.8;
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.visa-details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
 
-.visa-detail-item {
+.section-icon {
+  font-size: 1.5rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #2c5aa0, #1e3f73);
+  color: white;
+  border-radius: 12px;
+}
+
+.visa-info-title {
+  color: #2c5aa0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Overview Section */
+.visa-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.overview-item {
   background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 4px;
+  padding: 1.5rem;
+  border-radius: 12px;
   border-left: 4px solid #2c5aa0;
   transition: all 0.3s ease;
+}
+
+.overview-item:hover {
+  background: #e3f2fd;
+  transform: translateX(5px);
+}
+
+.overview-title {
+  color: #2c5aa0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.overview-content {
+  color: #495057;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Quick Info Cards */
+.visa-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.visa-detail-item {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border-left: 4px solid #2c5aa0;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .visa-detail-item:hover {
   background: #e3f2fd;
   transform: translateX(5px);
+}
+
+.detail-icon {
+  font-size: 1.5rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(44, 90, 160, 0.1);
+  border-radius: 50%;
+}
+
+.detail-content {
+  flex: 1;
 }
 
 .visa-detail-label {
@@ -140,83 +275,133 @@
 .visa-detail-value {
   font-weight: 500;
   color: #333;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
-.requirements-list {
-  list-style: none;
-  padding: 0;
+/* Documents Section */
+.documents-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.requirements-list li {
-  padding: 0.8rem;
-  color: #000;
-  position: relative;
-  margin-bottom: 0.5rem;
+.document-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
   background: #f8f9fa;
-  border-radius: 4px;
-  border-left: 4px solid #2c5aa0;
+  border-radius: 12px;
+  border-left: 4px solid #28a745;
   transition: all 0.3s ease;
 }
 
-.requirements-list li:hover {
-  background: #e3f2fd;
+.document-item:hover {
+  background: #e8f5e8;
   transform: translateX(5px);
 }
 
-.requirements-list li::before {
-  content: '✓';
-  color: #28a745;
-  font-weight: bold;
-  margin-right: 0.8rem;
-  background: rgba(40, 167, 69, 0.1);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
+.document-icon {
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  background: rgba(40, 167, 69, 0.1);
+  border-radius: 50%;
 }
 
-.process-steps {
-  list-style: none;
-  padding: 0;
-  counter-reset: step-counter;
+.document-name {
+  color: #495057;
+  font-weight: 500;
 }
 
-.process-steps li {
-  counter-increment: step-counter;
-  padding: 1rem;
-  color: #000;
-  position: relative;
-  margin-bottom: 0.8rem;
+/* Process Section */
+.process-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.process-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
   background: #f8f9fa;
-  border-radius: 4px;
+  border-radius: 12px;
   border-left: 4px solid #2c5aa0;
   transition: all 0.3s ease;
 }
 
-.process-steps li:hover {
+.process-step:hover {
   background: #e3f2fd;
   transform: translateX(5px);
 }
 
-.process-steps li::before {
-  content: counter(step-counter);
+.step-number {
+  width: 40px;
+  height: 40px;
   background: #2c5aa0;
   color: white;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  font-weight: bold;
-  margin-right: 0.8rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
+.step-content {
+  color: #495057;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* Notes Section */
+.notes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.note-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #fff3cd;
+  border-radius: 12px;
+  border-left: 4px solid #ffc107;
+  transition: all 0.3s ease;
+}
+
+.note-item:hover {
+  background: #ffeaa7;
+  transform: translateX(5px);
+}
+
+.note-icon {
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.note-content {
+  color: #856404;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* Sidebar */
 .visa-sidebar {
   display: flex;
   flex-direction: column;
@@ -226,48 +411,75 @@
 .pricing-card {
   background: linear-gradient(135deg, #2c5aa0, #1e3f73);
   color: white;
-  border-radius: 4px;
+  border-radius: 16px;
   padding: 2rem;
   text-align: center;
   box-shadow: 0 8px 25px rgba(44, 90, 160, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.pricing-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.pricing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
 }
 
 .pricing-title {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  margin: 0;
   opacity: 0.9;
 }
 
+.pricing-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
 .pricing-amount {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+  line-height: 1;
 }
 
 .pricing-period {
   opacity: 0.8;
   margin-bottom: 2rem;
+  font-size: 0.9rem;
 }
 
 .pricing-features {
-  list-style: none;
-  padding: 0;
   margin-bottom: 2rem;
 }
 
-.pricing-features li {
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.9rem;
 }
 
-.pricing-features li:last-child {
-  border-bottom: none;
-}
-
-.pricing-features li::before {
-  content: '✓';
-  margin-right: 0.5rem;
-  color: #4CAF50;
+.feature-icon {
+  font-size: 1rem;
 }
 
 .apply-now-button {
@@ -276,7 +488,7 @@
   background: white;
   color: #2c5aa0;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
@@ -292,33 +504,40 @@
 
 .support-card {
   background: white;
-  border-radius: 4px;
+  border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(44, 90, 160, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
   text-align: center;
+  position: relative;
+}
+
+.support-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
 }
 
 .support-title {
   color: #2c5aa0;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 700;
   margin-bottom: 1rem;
 }
 
 .support-text {
-  color: #000;
+  color: #495057;
   margin-bottom: 1.5rem;
   line-height: 1.6;
 }
 
 .contact-button {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   background: transparent;
   color: #2c5aa0;
   border: 2px solid #2c5aa0;
-  border-radius: 4px;
+  border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -329,79 +548,141 @@
   color: white;
 }
 
+/* Modal */
 .apply-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(44, 90, 160, 0.15);
+  background: rgba(44, 90, 160, 0.2);
   z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(5px);
 }
+
 .apply-modal {
   background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(44, 90, 160, 0.18);
-  padding: 2rem 2.5rem;
-  min-width: 320px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(44, 90, 160, 0.3);
+  padding: 2.5rem;
+  min-width: 400px;
   max-width: 90vw;
   text-align: center;
 }
-.modal-option-btn {
-  display: block;
-  width: 100%;
-  margin: 1rem 0;
-  padding: 14px;
-  background: linear-gradient(135deg, #2c5aa0, #1e3f73);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.modal-option-btn:hover {
-  background: linear-gradient(135deg, #1e3f73, #2c5aa0);
-}
-.modal-cancel-btn {
-  display: block;
-  width: 100%;
-  margin-top: 0.5rem;
-  padding: 12px;
-  background: #f5f5f5;
-  color: #2c5aa0;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.modal-cancel-btn:hover {
-  background: #e3e3e3;
+
+.modal-header {
+  margin-bottom: 2rem;
 }
 
-/* Tablet Responsive */
+.modal-header h3 {
+  color: #2c5aa0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.modal-header p {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.5rem;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.modal-option-btn.primary {
+  border-color: #2c5aa0;
+  background: linear-gradient(135deg, #2c5aa0, #1e3f73);
+  color: white;
+}
+
+.modal-option-btn.secondary {
+  border-color: #6c757d;
+  background: white;
+  color: #495057;
+}
+
+.modal-option-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.option-icon {
+  font-size: 1.5rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.modal-option-btn.secondary .option-icon {
+  background: rgba(44, 90, 160, 0.1);
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-title {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.option-subtitle {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.modal-cancel-btn {
+  width: 100%;
+  padding: 12px;
+  background: #f8f9fa;
+  color: #6c757d;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.modal-cancel-btn:hover {
+  background: #e9ecef;
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
   .visa-details-content {
     grid-template-columns: 1fr;
     gap: 2rem;
   }
   
-  .visa-hero {
-    height: 45vh;
-  }
-  
   .visa-hero-title {
-    font-size: 2.5rem;
-  }
-  
-  .visa-hero-icon {
-    font-size: 3rem;
+    font-size: 3.5rem;
   }
   
   .visa-main-info {
@@ -409,36 +690,26 @@
   }
   
   .visa-details-grid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .visa-hero {
-    height: 40vh;
-    min-height: 250px;
+    padding: 2.5rem 0 3.5rem;
   }
   
   .visa-hero-title {
-    font-size: 2rem;
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
-  
-  .visa-hero-icon {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
   
   .visa-hero-subtitle {
-    font-size: 1rem;
-    text-align: center;
+    font-size: 1.1rem;
   }
   
   .visa-back-button {
     padding: 10px 20px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     font-size: 13px;
   }
   
@@ -447,26 +718,26 @@
   }
   
   .visa-info-title {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+  }
+  
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
   
   .visa-details-grid {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
+    gap: 1rem;
   }
   
   .visa-detail-item {
-    padding: 0.8rem;
-  }
-  
-  .requirements-list li,
-  .process-steps li {
-    padding: 0.6rem;
-    font-size: 0.9rem;
+    padding: 1rem;
   }
   
   .pricing-amount {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
   
   .pricing-card {
@@ -476,21 +747,20 @@
   .support-card {
     padding: 1.5rem;
   }
+  
+  .apply-modal {
+    padding: 2rem;
+    min-width: 320px;
+  }
 }
 
-/* Small Mobile */
 @media (max-width: 480px) {
   .visa-hero {
-    height: 35vh;
-    min-height: 200px;
+    padding: 2rem 0 3rem;
   }
   
   .visa-hero-title {
-    font-size: 1.8rem;
-  }
-  
-  .visa-hero-icon {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
   
   .visa-main-info {
@@ -498,25 +768,35 @@
   }
   
   .visa-info-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
   
-  .visa-description-text {
-    font-size: 0.9rem;
-  }
-  
-  .requirements-list li,
-  .process-steps li {
-    padding: 0.5rem;
-    font-size: 0.85rem;
+  .section-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
   }
   
   .pricing-amount {
-    font-size: 2rem;
+    font-size: 2.5rem;
   }
   
   .pricing-card,
   .support-card {
     padding: 1rem;
+  }
+  
+  .apply-modal {
+    padding: 1.5rem;
+  }
+  
+  .modal-option-btn {
+    padding: 1rem;
+  }
+  
+  .option-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
 }
