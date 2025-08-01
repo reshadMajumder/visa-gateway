@@ -1,5 +1,6 @@
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import ChildHero from '../components/ChildHero'
 import './css/VisaDetails.css'
 
 const VisaDetails = () => {
@@ -19,6 +20,7 @@ const VisaDetails = () => {
     fetch(`http://127.0.0.1:8000/api/visa-types/${visaId}/`)
       .then(response => response.json())
       .then(data => {
+        console.log('Visa Details API Response:', data) // Debug log
         setVisaDetails(data)
       })
       .catch(error => console.error('Error fetching visa details:', error))
@@ -63,7 +65,7 @@ const VisaDetails = () => {
   const process = getApplicationProcess()
   const overviews = getOverviews()
   const notes = getNotes()
-
+  
   const handleBack = () => {
     navigate(`/country/${countryId}`, { state: { country } })
   }
@@ -114,23 +116,6 @@ const VisaDetails = () => {
 
   return (
     <div className="visa-details-page">
-      <div className="visa-hero">
-        <div className="visa-hero-content">
-          <div className="container">
-            <button className="visa-back-button" onClick={handleBack}>
-              ← Back to {country?.name} Visas
-            </button>
-            <h1 className="visa-hero-title">
-              <span className="visa-hero-icon">📄</span>
-              {details.name} for {country?.name}
-            </h1>
-            <h2 className="visa-headings">{details.headings}</h2>
-            <p className="visa-hero-subtitle">
-              Complete visa processing service with expert guidance
-            </p>
-          </div>
-        </div>
-      </div>
 
       <div className="container">
         <div className="visa-details-content">

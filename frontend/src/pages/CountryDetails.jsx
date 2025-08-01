@@ -2,9 +2,11 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import VisaTypesCard from '../components/VisaTypesCard'
 import './css/CountryDetails.css'
+import ChildHero from '../components/ChildHero'
 
 const CountryDetails = () => {
   const { countryId } = useParams()
+
   const location = useLocation()
   const navigate = useNavigate()
   const [country, setCountry] = useState(location.state?.country || {
@@ -46,9 +48,9 @@ const CountryDetails = () => {
         <img src={country.image} alt={country.name} />
         <div className="hero-overlay">
           <div className="container">
-            <button className="back-button" onClick={handleBack}>
+            {/* <button className="back-button" onClick={handleBack}>
               ← Back to Countries
-            </button>
+            </button> */}
             <h1 className="country-title">{country.name} Visa Services</h1>
             <p className="country-subtitle">
               Professional visa processing with high success rates
@@ -57,12 +59,13 @@ const CountryDetails = () => {
         </div>
       </div>
 
+
       <div className="container">
         <section className="visa-categories-section section">
           <h2 className="section-title">Available Visa Categories</h2>
-          <p className="section-subtitle">
+          {/* <p className="section-subtitle">
             Choose the visa type that best fits your travel purpose
-          </p>
+          </p> */}
           
           <div className="visa-categories-grid">
             {visaTypes.map((visa, index) => (

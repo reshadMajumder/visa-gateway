@@ -41,21 +41,19 @@ const VisaTypesCard = ({ visa, country, index, isLoaded }) => {
           <span className="visa-price-badge">
             {formatPrice(visa.price)}
           </span>
-          {visa.active && <span className="visa-status">Active</span>}
+          {/* {visa.active && <span className="visa-status">Active</span>} */}
         </div>
       </div>
       
       <div className="visa-card-content">
         <div className="visa-card-header">
           <h3 className="visa-card-title">{visa.name}</h3>
-          {visa.headings && (
+          
+        </div>
+                
+        {visa.headings && (
             <h4 className="visa-headings">{visa.headings}</h4>
           )}
-        </div>
-        
-        {visa.description && (
-          <p className="visa-card-description">{visa.description}</p>
-        )}
         
         <div className="visa-highlights">
           {visa.expected_processing_time && (
