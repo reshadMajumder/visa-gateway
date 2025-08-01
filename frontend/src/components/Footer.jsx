@@ -44,10 +44,10 @@ const Footer = () => {
           <div className="footer-section">
             <h4>Contact Info</h4>
             <div className="contact-info">
-              <p>📍 123 Business Center, NY 10001</p>
-              <p>📞 +1 (555) 123-4567</p>
-              <p>✉️ info@visaglobal.com</p>
-              <p>🕒 Mon-Fri: 9AM-6PM</p>
+              <p><span>📍</span> 123 Business Center, NY 10001</p>
+              <p><span>📞</span> +1 (555) 123-4567</p>
+              <p><span>✉️</span> info@visaglobal.com</p>
+              <p><span>🕒</span> Mon-Fri: 9AM-6PM</p>
             </div>
           </div>
         </div>
