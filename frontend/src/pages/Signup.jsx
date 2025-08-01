@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import './Signup.css'
+import './css/Signup.css'
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -43,7 +43,8 @@ const Signup = () => {
           username: formData.username,
           email: formData.email,
           full_name: formData.full_name,
-          password: formData.password
+          password: formData.password,
+          password2: formData.confirm_password,
         })
       })
 

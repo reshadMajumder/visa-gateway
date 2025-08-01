@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import VisaApplicationCard from '../components/VisaApplicationCard'
 import UserProfile from './UserProfile'
-import './UserAccount.css'
+import './css/UserAccount.css'
 
 const UserAccount = () => {
   const [activeTab, setActiveTab] = useState('dashboard')

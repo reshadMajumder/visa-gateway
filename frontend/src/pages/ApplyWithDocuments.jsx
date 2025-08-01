@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import './ApplyWithDocuments.css';
+import './css/ApplyWithDocuments.css';
 
 const ApplyWithDocuments = () => {
   const location = useLocation();

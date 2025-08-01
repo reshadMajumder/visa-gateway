@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import './OTPVerification.css'
+import './css/OTPVerification.css'
 
 const OTPVerification = () => {
   const location = useLocation()

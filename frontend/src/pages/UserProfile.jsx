@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './UserAccount.css'
+import './css/UserAccount.css'
 
 const UserProfile = ({ user, error, isEditing, setIsEditing, editForm, setEditForm, saving, handleEditChange, handleFileChange, handleEditSubmit, handleEditCancel }) => {
   return (

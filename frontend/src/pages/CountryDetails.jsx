@@ -1,6 +1,7 @@
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import './CountryDetails.css'
+import VisaTypesCard from '../components/VisaTypesCard'
+import './css/CountryDetails.css'
 
 const CountryDetails = () => {
   const { countryId } = useParams()
@@ -13,6 +14,7 @@ const CountryDetails = () => {
     image: 'http://127.0.0.1:8000/media/country_images/w1.jpg'
   })
   const [visaTypes, setVisaTypes] = useState([])
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     // Fetch visa types for the country
@@ -20,6 +22,8 @@ const CountryDetails = () => {
       .then(response => response.json())
       .then(data => {
         setVisaTypes(data)
+        // Trigger animation after data is loaded
+        setTimeout(() => setIsLoaded(true), 100)
       })
       .catch(error => console.error('Error fetching visa types:', error))
 
@@ -32,15 +36,8 @@ const CountryDetails = () => {
       .catch(error => console.error('Error fetching country details:', error))
   }, [countryId])
 
-
   const handleBack = () => {
     navigate('/')
-  }
-
-  const handleVisaSelect = (visa) => {
-    navigate(`/visa/${countryId}/${visa.id}`, { 
-      state: { visa, country } 
-    })
   }
 
   return (
@@ -68,82 +65,14 @@ const CountryDetails = () => {
           </p>
           
           <div className="visa-categories-grid">
-            {visaTypes.map((visa) => (
-              <div 
-                key={visa.id} 
-                className="visa-category-card"
-                onClick={() => handleVisaSelect(visa)}
-              >
-                <div className="visa-card-image">
-                  <img 
-                    src={`http://127.0.0.1:8000${visa.image}`} 
-                    alt={visa.name} 
-                  />
-                  <div className="visa-card-overlay">
-                    <span className="visa-price-badge">
-                      {visa.price ? `$${visa.price}` : 'Contact'}
-                    </span>
-                    {visa.active && <span className="visa-status">Active</span>}
-                  </div>
-                </div>
-                <div className="visa-card-content">
-                  <div className="visa-card-header">
-                    <h3 className="visa-card-title">{visa.name}</h3>
-                    <h4 className="visa-headings">{visa.headings}</h4>
-                  </div>
-                  <p className="visa-card-description">{visa.description}</p>
-                  
-                  {visa.expected_processing_time && (
-                    <div className="processing-time">
-                      <span>Processing Time: {visa.expected_processing_time}</span>
-                    </div>
-                  )}
-                  
-                  <div className="visa-details">
-                    <div className="visa-section">
-                      <h5>Required Documents ({visa.required_documents.length})</h5>
-                      <ul className="document-list">
-                        {visa.required_documents.slice(0, 2).map(doc => (
-                          <li key={doc.id}>
-                            {doc.document_name}
-                            {doc.is_mandatory && <span className="mandatory">*</span>}
-                          </li>
-                        ))}
-                        {visa.required_documents.length > 2 && (
-                          <li>+{visa.required_documents.length - 2} more</li>
-                        )}
-                      </ul>
-                    </div>
-                    
-                    {visa.processes.length > 0 && (
-                      <div className="visa-section">
-                        <h5>Process Steps ({visa.processes.length})</h5>
-                        <ul className="process-list">
-                          {visa.processes.slice(0, 1).map(process => (
-                            <li key={process.id}>{process.points}</li>
-                          ))}
-                          {visa.processes.length > 1 && (
-                            <li>+{visa.processes.length - 1} more steps</li>
-                          )}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="visa-meta">
-                    <span className="visa-created">
-                      Added: {new Date(visa.created_at).toLocaleDateString()}
-                    </span>
-                    <span className="visa-updated">
-                      Updated: {new Date(visa.updated_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  
-                  <div className="visa-card-footer">
-                    <button className="visa-view-button">View Details</button>
-                  </div>
-                </div>
-              </div>
+            {visaTypes.map((visa, index) => (
+              <VisaTypesCard
+                key={visa.id}
+                visa={visa}
+                country={country}
+                index={index}
+                isLoaded={isLoaded}
+              />
             ))}
           </div>
         </section>

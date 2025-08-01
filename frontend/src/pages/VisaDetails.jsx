@@ -1,6 +1,6 @@
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import './VisaDetails.css'
+import './css/VisaDetails.css'
 
 const VisaDetails = () => {
   const { countryId, visaId } = useParams()
