@@ -25,6 +25,8 @@ class RequiredDocumentsSerializer(serializers.ModelSerializer):
         model = RequiredDocuments
         fields = '__all__'
 
+    
+
 class DetailedVisaTypeSerializer(serializers.ModelSerializer):
     processes = visaProcessSerializer(many=True)
     overviews = VisaOverviewSerializer(many=True)
@@ -269,6 +271,9 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
 
     def get_visa_type(self, obj):
         required_documents = []
+        # validate the file size and type pdf, docx, doc, jpg, jpeg, png
+        
+
         uploaded_docs = {
             doc.required_document.id: doc for doc in obj.documents.all()
         }
@@ -316,6 +321,11 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
         # Handle uploaded files
         for key, file in request.FILES.items():
             if key.startswith("required_documents["):
+                # validate the file size and type pdf, docx, doc, jpg, jpeg, png
+                if file.size > 1024 * 1024 * 10:
+                    raise serializers.ValidationError("File size cannot exceed 10MB")
+                if not (file.name.endswith('.pdf') or file.name.endswith('.docx') or file.name.endswith('.doc') or file.name.endswith('.jpg') or file.name.endswith('.jpeg') or file.name.endswith('.png')):
+                    raise serializers.ValidationError("File type is not allowed")
                 doc_id = key.split("[")[1].split("]")[0]
                 try:
                     required_doc = RequiredDocuments.objects.get(id=doc_id)

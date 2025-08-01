@@ -80,17 +80,20 @@ const VisaDetails = () => {
   const handleApplyWithoutDocuments = async () => {
     setShowApplyModal(false)
     
+    // Get token from localStorage
+    const token = localStorage.getItem('accessToken')
+    
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/visa-applications/', {
+      const formData = new FormData();
+      formData.append('country_id', country.id);
+      formData.append('visa_type_id', parseInt(visaId));
+      
+      const response = await fetch('http://127.0.0.1:8000/api/v2/visa-applications/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          country_id: country.id,
-          visa_type_id: parseInt(visaId)
-          // No required_documents_files - creates draft application
-        })
+        body: formData
       })
       
       if (response.ok) {
