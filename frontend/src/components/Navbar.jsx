@@ -12,6 +12,39 @@ const Navbar = () => {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const checkAuthStatus = () => {
+    const accessToken = localStorage.getItem('accessToken')
+    const userData = localStorage.getItem('user')
+    
+    console.log('Checking auth status:', { accessToken: !!accessToken, userData: !!userData })
+    
+    if (accessToken && userData) {
+      console.log('Setting authenticated to true')
+      setIsAuthenticated(true)
+      setUser(JSON.parse(userData))
+    } else {
+      console.log('Setting authenticated to false')
+      setIsAuthenticated(false)
+      setUser(null)
+    }
+  }
+
+  // Force re-render when auth state changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const accessToken = localStorage.getItem('accessToken')
+      const userData = localStorage.getItem('user')
+      const shouldBeAuthenticated = !!(accessToken && userData)
+      
+      if (shouldBeAuthenticated !== isAuthenticated) {
+        console.log('Auth state mismatch detected, updating...')
+        checkAuthStatus()
+      }
+    }, 1000) // Check every second
+
+    return () => clearInterval(interval)
+  }, [isAuthenticated])
+
   useEffect(() => {
     // Fetch countries from API
     fetch('http://127.0.0.1:8000/api/countries/')
@@ -26,12 +59,20 @@ const Navbar = () => {
 
   useEffect(() => {
     // Check if user is authenticated on component mount
-    const accessToken = localStorage.getItem('accessToken')
-    const userData = localStorage.getItem('user')
-    
-    if (accessToken && userData) {
-      setIsAuthenticated(true)
-      setUser(JSON.parse(userData))
+    checkAuthStatus()
+
+    // Listen for authentication state changes
+    const handleAuthChange = () => {
+      console.log('Auth state changed event received')
+      checkAuthStatus()
+    }
+
+    // Add event listener for authentication changes
+    window.addEventListener('authStateChanged', handleAuthChange)
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener('authStateChanged', handleAuthChange)
     }
   }, [])
 
@@ -58,7 +99,14 @@ const Navbar = () => {
       setIsAuthenticated(false)
       setUser(null)
       setIsProfileDropdownOpen(false)
-      navigate('/')
+      
+      // Dispatch custom event to notify navbar of authentication change
+      window.dispatchEvent(new Event('authStateChanged'))
+      
+      // Small delay to ensure event is processed before navigation
+      setTimeout(() => {
+        navigate('/')
+      }, 100)
     })
   }
 

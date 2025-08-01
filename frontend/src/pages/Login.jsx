@@ -40,8 +40,14 @@ const Login = () => {
         localStorage.setItem('refreshToken', data.tokens.refresh)
         localStorage.setItem('user', JSON.stringify(data.user))
         
-        // Navigate to home page
-        navigate('/')
+        // Dispatch custom event to notify navbar of authentication change
+        console.log('Dispatching authStateChanged event')
+        window.dispatchEvent(new Event('authStateChanged'))
+        
+        // Small delay to ensure event is processed before navigation
+        setTimeout(() => {
+          navigate('/')
+        }, 100)
       } else {
         setError(data.error || 'Login failed. Please try again.')
       }
