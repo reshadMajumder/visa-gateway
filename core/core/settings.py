@@ -157,17 +157,17 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '30/minute',  # Anonymous users: 5 requests per minute
+        'anon': '100/minute',  # Anonymous users: 5 requests per minute
         'user': '100/minute',  # Authenticated users: 100 requests per minute
-        'login': '20/minute',  # Login attempts: 5 per minute
-        'register': '20/hour',  # Registration attempts: 3 per hour
+        'login': '100/minute',  # Login attempts: 5 per minute
+        'register': '100/hour',  # Registration attempts: 3 per hour
     }
 }
 
 # JWT settings
 from datetime import timedelta
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=300),  # Reduced from 60 minutes
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30000000),  # Reduced from 60 minutes
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Increased from 1 day
     'ROTATE_REFRESH_TOKENS': True,                   # Enable token rotation
     'BLACKLIST_AFTER_ROTATION': True,
@@ -188,6 +188,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
+    'MAX_FILE_SIZE': 1024 * 1024 * 10,  # 10MB
 }
 
 # CORS settings

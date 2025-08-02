@@ -6,6 +6,8 @@ import Signup from './pages/Signup'
 import OTPVerification from './pages/OTPVerification'
 import CountryDetails from './pages/CountryDetails'
 import VisaDetails from './pages/VisaDetails'
+import ApplyWithDocuments from './pages/ApplyWithDocuments'
+import UserVisaDetails from './pages/UserVisaDetails'
 import About from './pages/About'
 import Gallery from './pages/Gallery'
 import Contact from './pages/Contact'
@@ -26,6 +28,8 @@ function App() {
           <Route path="/otp-verification" element={<OTPVerification />} />
           <Route path="/country/:countryId" element={<CountryDetails />} />
           <Route path="/visa/:countryId/:visaId" element={<VisaDetails />} />
+          <Route path="/apply-with-documents" element={<ApplyWithDocuments />} />
+          <Route path="/visa-application/:applicationId" element={<UserVisaDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/contact" element={<Contact />} />

@@ -18,6 +18,25 @@
   cursor: pointer;
   border: 1px solid rgba(44, 90, 160, 0.08);
   position: relative;
+  transform: translateY(100px);
+  opacity: 0;
+  animation: slideUpFade 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.country-card.card-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@keyframes slideUpFade {
+  0% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .country-card::before {
@@ -57,6 +76,29 @@
 
 .country-card:hover .card-image img {
   transform: scale(1.08);
+}
+
+.country-code {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, rgba(44, 90, 160, 0.95), rgba(30, 63, 115, 0.95));
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.country-card:hover .country-code {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(44, 90, 160, 0.4);
 }
 
 .card-overlay {
@@ -296,6 +338,13 @@
     width: 100%;
     background: linear-gradient(135deg, #1e3a5f, #26547c);
   }
+  
+  .country-code {
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    top: 10px;
+    right: 10px;
+  }
 }
 
 /* Small Mobile - still 2 columns but smaller */
@@ -347,5 +396,12 @@
     font-size: 0.75rem;
     padding: 6px 10px;
     background: linear-gradient(135deg, #1e3a5f, #26547c);
+  }
+  
+  .country-code {
+    font-size: 0.7rem;
+    padding: 5px 8px;
+    top: 8px;
+    right: 8px;
   }
 }

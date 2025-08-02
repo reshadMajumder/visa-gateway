@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import './Signup.css'
+import './css/Signup.css'
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -43,7 +43,8 @@ const Signup = () => {
           username: formData.username,
           email: formData.email,
           full_name: formData.full_name,
-          password: formData.password
+          password: formData.password,
+          password2: formData.confirm_password,
         })
       })
 
@@ -55,8 +56,13 @@ const Signup = () => {
         localStorage.setItem('refreshToken', data.tokens.refresh)
         localStorage.setItem('user', JSON.stringify(data.user))
         
-        // Navigate to home page
-        navigate('/')
+        // Dispatch custom event to notify navbar of authentication change
+        window.dispatchEvent(new Event('authStateChanged'))
+        
+        // Small delay to ensure event is processed before navigation
+        setTimeout(() => {
+          navigate('/')
+        }, 100)
       } else {
         setError(data.error || Object.values(data)[0]?.[0] || 'Registration failed. Please try again.')
       }

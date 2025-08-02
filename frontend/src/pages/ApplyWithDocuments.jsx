@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import './css/ApplyWithDocuments.css';
 
 const ApplyWithDocuments = () => {
   const location = useLocation();
@@ -23,6 +24,37 @@ const ApplyWithDocuments = () => {
     setDocFiles(prev => ({ ...prev, [docId]: file }));
   };
 
+  const handleRemoveFile = (docId) => {
+    setDocFiles(prev => {
+      const newFiles = { ...prev };
+      delete newFiles[docId];
+      return newFiles;
+    });
+  };
+
+  const getFileIcon = (fileName) => {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'pdf': return '📄';
+      case 'doc':
+      case 'docx': return '📝';
+      case 'jpg':
+      case 'jpeg':
+      case 'png': return '🖼️';
+      default: return '📎';
+    }
+  };
+
+  const getUploadProgress = () => {
+    const uploadedCount = Object.keys(docFiles).length;
+    const totalCount = requiredDocs.length;
+    return {
+      uploaded: uploadedCount,
+      total: totalCount,
+      percentage: totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,25 +72,23 @@ const ApplyWithDocuments = () => {
     formData.append('country_id', countryId);
     formData.append('visa_type_id', visaTypeId);
     
-    // Create the required_documents_files array
-    const filesArray = requiredDocs.map(doc => ({
-      required_document_id: doc.id,
-      file: docFiles[doc.id]
-    }));
-    
-    // Append the files array as JSON string
-    formData.append('required_documents_files', JSON.stringify(filesArray));
-    
-    // Append each file with a unique key
+    // Append each file with the correct key format: required_documents[document_id]
     requiredDocs.forEach(doc => {
-      formData.append(`file_${doc.id}`, docFiles[doc.id]);
+      if (docFiles[doc.id]) {
+        formData.append(`required_documents[${doc.id}]`, docFiles[doc.id]);
+      }
     });
     
+    // Get token from localStorage
+    const token = localStorage.getItem('accessToken');
+    
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/visa-applications/', {
+      const res = await fetch('http://127.0.0.1:8000/api/v2/visa-applications/', {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
-        // Add auth headers if needed
       });
       
       if (res.ok) {
@@ -66,7 +96,7 @@ const ApplyWithDocuments = () => {
         setTimeout(() => navigate('/account'), 2000);
       } else {
         const errorData = await res.json();
-        setError(errorData.required_documents_files?.[0] || 'Failed to submit application.');
+        setError(errorData.error || 'Failed to submit application.');
       }
     } catch (err) {
       setError('Failed to submit application.');
@@ -74,31 +104,84 @@ const ApplyWithDocuments = () => {
     setLoading(false);
   };
 
+  const progress = getUploadProgress();
+
   if (!countryId || !visaTypeId) return <div>Invalid access.</div>;
 
   return (
     <div className="apply-docs-page">
-      <h2>Apply with Documents</h2>
+      <button className="back-button" onClick={() => navigate(-1)}>
+        Back to Visa Details
+      </button>
+      
+      <h2>Upload Required Documents</h2>
+      <p className="subtitle">
+        Please upload all required documents for your visa application. 
+        Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG (Max 10MB each)
+      </p>
+
       {success ? (
-        <div className="success-msg">Application submitted successfully!</div>
+        <div className="success-msg">
+          Application submitted successfully! Redirecting to your account...
+        </div>
       ) : (
-        <form onSubmit={handleSubmit}>
-          {requiredDocs.map(doc => (
-            <div key={doc.id} className="doc-upload-field">
-              <label>{doc.document_name}</label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                required
-                onChange={e => handleFileChange(doc.id, e.target.files[0])}
-              />
-            </div>
-          ))}
-          {error && <div className="error-msg">{error}</div>}
-          <button type="submit" disabled={loading}>
-            {loading ? 'Submitting...' : 'Submit Application'}
-          </button>
-        </form>
+        <>
+          <div className="upload-status">
+            <span className="status-text">Upload Progress</span>
+            <span className="status-count">
+              {progress.uploaded}/{progress.total}
+            </span>
+          </div>
+          
+          <div className="progress-bar">
+            <div 
+              className="progress-fill" 
+              style={{ width: `${progress.percentage}%` }}
+            ></div>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            {requiredDocs.map(doc => (
+              <div 
+                key={doc.id} 
+                className={`doc-upload-field ${docFiles[doc.id] ? 'has-file' : ''}`}
+              >
+                <label>{doc.document_name}</label>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  required
+                  onChange={e => handleFileChange(doc.id, e.target.files[0])}
+                />
+                
+                {docFiles[doc.id] && (
+                  <div className="file-info">
+                    <span className="file-icon">
+                      {getFileIcon(docFiles[doc.id].name)}
+                    </span>
+                    <span className="file-name">
+                      {docFiles[doc.id].name}
+                    </span>
+                    <button
+                      type="button"
+                      className="remove-file"
+                      onClick={() => handleRemoveFile(doc.id)}
+                      title="Remove file"
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {error && <div className="error-msg">{error}</div>}
+            
+            <button type="submit" disabled={loading || progress.uploaded < progress.total}>
+              {loading ? 'Submitting Application...' : 'Submit Application'}
+            </button>
+          </form>
+        </>
       )}
     </div>
   );

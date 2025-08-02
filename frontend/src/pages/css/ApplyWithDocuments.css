@@ -1,0 +1,264 @@
+.apply-docs-page {
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(44, 90, 160, 0.12);
+  padding: 40px 32px;
+  border: 1px solid #e8f0f8;
+}
+
+.apply-docs-page h2 {
+  text-align: center;
+  color: #2c5aa0;
+  margin-bottom: 8px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.apply-docs-page .subtitle {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 32px;
+  font-size: 0.95rem;
+}
+
+.doc-upload-field {
+  margin-bottom: 24px;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 20px;
+  border: 2px dashed #d1d5db;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.doc-upload-field:hover {
+  border-color: #2c5aa0;
+  background: #f0f7ff;
+}
+
+.doc-upload-field.has-file {
+  border-color: #10b981;
+  background: #f0fdf4;
+}
+
+.doc-upload-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.doc-upload-field .file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #e6f0fa;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #2c5aa0;
+}
+
+.doc-upload-field .file-info .file-icon {
+  font-size: 1.1rem;
+}
+
+.doc-upload-field .file-info .file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-upload-field .file-info .remove-file {
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.doc-upload-field .file-info .remove-file:hover {
+  background: #fef2f2;
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+input[type="file"]:focus {
+  outline: none;
+  border-color: #2c5aa0;
+  box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+}
+
+button[type="submit"] {
+  width: 100%;
+  background: linear-gradient(135deg, #2c5aa0 0%, #1e40af 100%);
+  color: #fff;
+  border: none;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+}
+
+button[type="submit"]:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button[type="submit"]:disabled {
+  background: #b3c6e0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+button[type="submit"]:disabled::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.success-msg {
+  color: #059669;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1px solid #10b981;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.success-msg::before {
+  content: '✓';
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.error-msg {
+  color: #dc2626;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  border: 1px solid #f87171;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.error-msg::before {
+  content: '⚠';
+  font-size: 1.1rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.progress-bar .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2c5aa0 0%, #1e40af 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.upload-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.upload-status .status-text {
+  font-weight: 500;
+  color: #374151;
+}
+
+.upload-status .status-count {
+  background: #2c5aa0;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #2c5aa0;
+  cursor: pointer;
+  padding: 8px 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 16px;
+  transition: color 0.2s;
+}
+
+.back-button:hover {
+  color: #1e40af;
+}
+
+.back-button::before {
+  content: '←';
+  font-size: 1.1rem;
+}
+
+
+

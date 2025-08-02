@@ -8,17 +8,71 @@ const Navbar = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
+  const [countries, setCountries] = useState([])
   const location = useLocation()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    // Check if user is authenticated on component mount
+  const checkAuthStatus = () => {
     const accessToken = localStorage.getItem('accessToken')
     const userData = localStorage.getItem('user')
     
+    console.log('Checking auth status:', { accessToken: !!accessToken, userData: !!userData })
+    
     if (accessToken && userData) {
+      console.log('Setting authenticated to true')
       setIsAuthenticated(true)
       setUser(JSON.parse(userData))
+    } else {
+      console.log('Setting authenticated to false')
+      setIsAuthenticated(false)
+      setUser(null)
+    }
+  }
+
+  // Force re-render when auth state changes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const accessToken = localStorage.getItem('accessToken')
+      const userData = localStorage.getItem('user')
+      const shouldBeAuthenticated = !!(accessToken && userData)
+      
+      if (shouldBeAuthenticated !== isAuthenticated) {
+        console.log('Auth state mismatch detected, updating...')
+        checkAuthStatus()
+      }
+    }, 1000) // Check every second
+
+    return () => clearInterval(interval)
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    // Fetch countries from API
+    fetch('http://127.0.0.1:8000/api/countries/')
+      .then(response => response.json())
+      .then(data => {
+        setCountries(data)
+      })
+      .catch(error => {
+        console.error('Error fetching countries:', error)
+      })
+  }, [])
+
+  useEffect(() => {
+    // Check if user is authenticated on component mount
+    checkAuthStatus()
+
+    // Listen for authentication state changes
+    const handleAuthChange = () => {
+      console.log('Auth state changed event received')
+      checkAuthStatus()
+    }
+
+    // Add event listener for authentication changes
+    window.addEventListener('authStateChanged', handleAuthChange)
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener('authStateChanged', handleAuthChange)
     }
   }, [])
 
@@ -45,27 +99,30 @@ const Navbar = () => {
       setIsAuthenticated(false)
       setUser(null)
       setIsProfileDropdownOpen(false)
-      navigate('/')
+      
+      // Dispatch custom event to notify navbar of authentication change
+      window.dispatchEvent(new Event('authStateChanged'))
+      
+      // Small delay to ensure event is processed before navigation
+      setTimeout(() => {
+        navigate('/')
+      }, 100)
     })
   }
 
-  const countries = [
-    { name: 'Romania', flag: '🇷🇴', id: 1 },
-    { name: 'United States', flag: '🇺🇸', id: 2 },
-    { name: 'Canada', flag: '🇨🇦', id: 3 },
-    { name: 'United Kingdom', flag: '🇬🇧', id: 4 },
-    { name: 'Australia', flag: '🇦🇺', id: 5 },
-    { name: 'Germany', flag: '🇩🇪', id: 6 },
-    { name: 'France', flag: '🇫🇷', id: 7 },
-    { name: 'Japan', flag: '🇯🇵', id: 8 },
-    { name: 'Singapore', flag: '🇸🇬', id: 9 }
-  ]
+  const getCountryFlag = (code) => {
+    // Convert country code to flag emoji
+    const codePoints = code
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt())
+    return String.fromCodePoint(...codePoints)
+  }
 
   const handleCountrySelect = (country) => {
     setIsCountriesDropdownOpen(false)
     setIsMobileMenuOpen(false)
-    // Navigate to country page
-    window.location.href = `/country/${country.id}`
+    navigate(`/country/${country.id}`, { state: { country } })
   }
 
   return (
@@ -74,15 +131,12 @@ const Navbar = () => {
       <div className="top-navbar">
         <div className="container">
           <div className="top-nav-content">
-            <div className="nav-logo">
+            {/* <div className="nav-logo"> */}
               <Link to="/">
-                <div className="nav-logo-icon">✈️</div>
-                <div>
-                  <h2>VisaGlobal</h2>
-                  <span className="tagline">One World, One Visa</span>
-                </div>
+                <img src='/logo.png' alt="VisaGlobal" style={{width:'50px', objectFit: 'cover'}}/>
               </Link>
-            </div>
+            {/* </div> */}
+
             
             <div className="auth-section">
               {isAuthenticated ? (
@@ -184,7 +238,7 @@ const Navbar = () => {
                       className="dropdown-item"
                       onClick={() => handleCountrySelect(country)}
                     >
-                      <span className="country-flag">{country.flag}</span>
+                      <span className="country-flag">{getCountryFlag(country.code)}</span>
                       {country.name}
                     </button>
                   ))}

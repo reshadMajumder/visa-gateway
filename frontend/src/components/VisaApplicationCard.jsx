@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './VisaApplicationCard.css'
 
 const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) => {
   const [selectedFiles, setSelectedFiles] = useState({})
   const [uploadingDocuments, setUploadingDocuments] = useState(false)
   const [uploadError, setUploadError] = useState('')
+  const [showUploadSection, setShowUploadSection] = useState(false)
+  const navigate = useNavigate()
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -57,8 +60,8 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
   const getMissingDocuments = () => {
     if (!application.visa_type.required_documents) return []
     
-    const uploadedDocIds = application.required_documents?.map(doc => doc.required_document_id) || []
-    return application.visa_type.required_documents.filter(doc => !uploadedDocIds.includes(doc.id))
+    // Find documents that don't have a document_file uploaded
+    return application.visa_type.required_documents.filter(doc => !doc.document_file)
   }
 
   // Check if application needs document updates (draft, missing docs, or rejected)
@@ -87,7 +90,7 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
       const accessToken = localStorage.getItem('accessToken')
       const formData = new FormData()
       
-      // Add application IDs
+      // Add required fields for v2 API
       formData.append('visa_type_id', application.visa_type.id.toString())
       formData.append('country_id', application.country.id.toString())
       
@@ -96,22 +99,16 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
         ? application.visa_type.required_documents 
         : getMissingDocuments()
       
-      // Create the required_documents_files JSON
-      const documentsArray = documentsToUpload.map(doc => ({
-        required_document_id: doc.id
-      }))
-      formData.append('required_documents_files', JSON.stringify(documentsArray))
-      
-      // Add files
+      // Add files using the new format: required_documents[document_id]
       documentsToUpload.forEach(doc => {
         const file = selectedFiles[doc.id]
         if (file) {
-          formData.append(`file_${doc.id}`, file)
+          formData.append(`required_documents[${doc.id}]`, file)
         }
       })
 
-      const response = await fetch(`http://127.0.0.1:8000/api/visa-applications/${application.id}/`, {
-        method: 'PATCH',
+      const response = await fetch(`http://127.0.0.1:8000/api/v2/visa-applications/${application.id}/`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },
@@ -119,19 +116,23 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
       })
 
       if (response.ok) {
+        const result = await response.json()
         setSelectedFiles({})
         setUploadError('')
+        setShowUploadSection(false)
         onUploadSuccess && onUploadSuccess()
-        const successMessage = application.status === 'draft' 
+        
+        // Show success message from API response
+        const successMessage = result.message || (application.status === 'draft' 
           ? 'Documents uploaded successfully! Application status updated to submitted.'
-          : 'Documents updated successfully!'
+          : 'Documents updated successfully!')
         alert(successMessage)
       } else if (response.status === 401) {
         setUploadError('Session expired. Please login again.')
         onUploadError && onUploadError('Session expired. Please login again.')
       } else {
         const errorData = await response.json()
-        const errorMessage = errorData.error || 'Failed to upload documents'
+        const errorMessage = errorData.error || errorData.message || 'Failed to upload documents'
         setUploadError(errorMessage)
         onUploadError && onUploadError(errorMessage)
       }
@@ -144,35 +145,12 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
     }
   }
 
-  const refreshToken = async () => {
-    const refreshTokenValue = localStorage.getItem('refreshToken')
-    if (!refreshTokenValue) return false
-
-    try {
-      const response = await fetch('http://127.0.0.1:8000/api/accounts/login/refresh/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refresh: refreshTokenValue })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        localStorage.setItem('accessToken', data.access)
-        if (data.refresh) {
-          localStorage.setItem('refreshToken', data.refresh)
-        }
-        return true
-      }
-    } catch (error) {
-      console.error('Token refresh failed:', error)
-    }
-    return false
+  const handleViewDetails = () => {
+    navigate(`/visa-application/${application.id}`)
   }
 
   const missingDocuments = getMissingDocuments()
-  const showUploadSection = needsDocumentUpdate()
+  const needsUpdate = needsDocumentUpdate()
 
   return (
     <div className="application-card">
@@ -204,157 +182,122 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
 
       <div className="application-details">
         <div className="detail-item">
-          <span className="label">Application ID:</span>
+          <span className="label">ID:</span>
           <span className="value">#{application.id}</span>
         </div>
         <div className="detail-item">
-          <span className="label">Application Date:</span>
+          <span className="label">Date:</span>
           <span className="value">{formatDate(application.created_at)}</span>
-        </div>
-        <div className="detail-item">
-          <span className="label">Last Updated:</span>
-          <span className="value">{formatDate(application.updated_at)}</span>
         </div>
         {application.admin_notes && (
           <div className="detail-item admin-notes">
-            <span className="label">Admin Notes:</span>
+            <span className="label">Notes:</span>
             <span className="value">{application.admin_notes}</span>
           </div>
         )}
         {application.rejection_reason && (
           <div className="detail-item rejection-reason">
-            <span className="label">Rejection Reason:</span>
+            <span className="label">Rejection:</span>
             <span className="value">{application.rejection_reason}</span>
           </div>
         )}
       </div>
 
-      {/* Show uploaded documents if any */}
-      {application.required_documents && application.required_documents.length > 0 && (
-        <div className="documents-section">
-          <h4>Uploaded Documents</h4>
-          <div className="documents-list">
-            {application.required_documents.map((doc) => (
-              <div key={doc.id} className="document-item">
-                <div className="document-info">
-                  <span className="document-name">{doc.document_name}</span>
-                  <span 
-                    className="document-status"
-                    style={{ backgroundColor: getDocumentStatusColor(doc.status) }}
-                  >
-                    {doc.status}
-                  </span>
-                </div>
-                {doc.file && (
-                  <a 
-                    href={`http://127.0.0.1:8000${doc.file}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="document-link"
-                  >
-                    View Document
-                  </a>
-                )}
-                {doc.rejection_reason && (
-                  <div className="document-rejection">
-                    <span className="rejection-label">Rejection:</span>
-                    <span className="rejection-reason">{doc.rejection_reason}</span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+      {/* Show uploaded documents count */}
+      {application.visa_type.required_documents && application.visa_type.required_documents.length > 0 && (
+        <div className="documents-summary">
+          <span className="documents-count">
+            📎 {application.visa_type.required_documents.filter(doc => doc.document_file).length} of {application.visa_type.required_documents.length} document{application.visa_type.required_documents.length !== 1 ? 's' : ''} uploaded
+          </span>
         </div>
       )}
 
       {/* Show upload section for missing documents or rejected applications */}
-      {showUploadSection && (
-        <div className="required-documents-section">
-          <h4>
-            {application.status === 'draft' ? 'Required Documents' : 
-             application.status === 'rejected' ? 'Update Documents' : 'Missing Documents'}
-          </h4>
-          <p className="section-description">
-            {application.status === 'draft' && 'Upload the following documents to complete your application:'}
-            {application.status === 'rejected' && 'Please update the following documents based on the rejection feedback:'}
-            {application.status !== 'draft' && application.status !== 'rejected' && 'Please upload the following missing documents:'}
-          </p>
-          
-          {uploadError && (
-            <div className="error-message upload-error">
-              {uploadError}
-              <button onClick={() => setUploadError('')} className="close-error">×</button>
+      {needsUpdate && (
+        <div className="upload-section">
+          {!showUploadSection ? (
+            <button 
+              className="upload-toggle-button"
+              onClick={() => setShowUploadSection(true)}
+            >
+              {application.status === 'draft' ? 'Upload Documents' : 
+               application.status === 'rejected' ? 'Update Documents' : 'Upload Missing Documents'}
+            </button>
+          ) : (
+            <div className="upload-fields">
+              <div className="upload-header">
+                <h4>
+                  {application.status === 'draft' ? 'Required Documents' : 
+                   application.status === 'rejected' ? 'Update Documents' : 'Missing Documents'}
+                </h4>
+                <button 
+                  className="close-upload"
+                  onClick={() => setShowUploadSection(false)}
+                >
+                  ×
+                </button>
+              </div>
+              
+              {uploadError && (
+                <div className="error-message upload-error">
+                  {uploadError}
+                  <button onClick={() => setUploadError('')} className="close-error">×</button>
+                </div>
+              )}
+
+              {(() => {
+                const documentsToShow = application.status === 'draft' 
+                  ? application.visa_type.required_documents 
+                  : missingDocuments
+                
+                return documentsToShow.length > 0 ? (
+                  documentsToShow.map((doc) => (
+                    <div key={doc.id} className="upload-field">
+                      <label>{doc.document_name}</label>
+                      <input
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        onChange={(e) => handleDocumentFileChange(doc.id, e)}
+                        className="file-input"
+                      />
+                      {selectedFiles[doc.id] && (
+                        <span className="file-selected">
+                          ✓ {selectedFiles[doc.id].name}
+                        </span>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-documents">No documents required for this visa type.</p>
+                )
+              })()}
+
+              {(() => {
+                const documentsToShow = application.status === 'draft' 
+                  ? application.visa_type.required_documents 
+                  : missingDocuments
+                
+                return documentsToShow.length > 0 && (
+                  <button 
+                    className="upload-button"
+                    onClick={handleUploadDocuments}
+                    disabled={uploadingDocuments}
+                  >
+                    {uploadingDocuments ? 'Uploading...' : 
+                     application.status === 'draft' ? 'Upload & Submit' :
+                     application.status === 'rejected' ? 'Update Documents' : 'Upload Documents'}
+                  </button>
+                )
+              })()}
             </div>
           )}
-
-          <div className="upload-fields">
-            {(() => {
-              const documentsToShow = application.status === 'draft' 
-                ? application.visa_type.required_documents 
-                : missingDocuments
-              
-              return documentsToShow.length > 0 ? (
-                documentsToShow.map((doc) => (
-                  <div key={doc.id} className="upload-field">
-                    <label>{doc.document_name}</label>
-                    <input
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                      onChange={(e) => handleDocumentFileChange(doc.id, e)}
-                      className="file-input"
-                    />
-                    {selectedFiles[doc.id] && (
-                      <span className="file-selected">
-                        ✓ {selectedFiles[doc.id].name}
-                      </span>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p className="no-documents">No documents required for this visa type.</p>
-              )
-            })()}
-          </div>
-
-          {(() => {
-            const documentsToShow = application.status === 'draft' 
-              ? application.visa_type.required_documents 
-              : missingDocuments
-            
-            return documentsToShow.length > 0 && (
-              <button 
-                className="upload-button"
-                onClick={handleUploadDocuments}
-                disabled={uploadingDocuments}
-              >
-                {uploadingDocuments ? 'Uploading...' : 
-                 application.status === 'draft' ? 'Upload Documents & Submit' :
-                 application.status === 'rejected' ? 'Update Documents' : 'Upload Missing Documents'}
-              </button>
-            )
-          })()}
-        </div>
-      )}
-
-      {/* Show complete application button for draft applications without required documents */}
-      {application.status === 'draft' && (!application.visa_type.required_documents || application.visa_type.required_documents.length === 0) && (
-        <div className="complete-application-section">
-          <h4>Complete Application</h4>
-          <p className="section-description">
-            No documents are required for this visa type. You can complete your application now.
-          </p>
-          <button 
-            className="complete-button"
-            onClick={handleUploadDocuments}
-            disabled={uploadingDocuments}
-          >
-            {uploadingDocuments ? 'Completing...' : 'Complete Application'}
-          </button>
         </div>
       )}
 
       <div className="application-actions">
-        <button className="action-button primary">View Details</button>
+        <button className="action-button primary" onClick={handleViewDetails}>
+          View Details
+        </button>
         {application.status === 'submitted' && (
           <button className="action-button secondary">Track Status</button>
         )}
