@@ -207,9 +207,9 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOWED_ORIGINS = [
     "https://spring.rexhad.co",
-    'localhost:3000',
+    'http://localhost:3000',
     'http://localhost:5173',
-    
+
 
 
 ]
