@@ -38,14 +38,26 @@ const UserProfile = ({ user, error, isEditing, setIsEditing, editForm, setEditFo
           </div>
           
           <div className="form-group">
-            <label>Full Name</label>
+            <label>First Name</label>
             <input 
               type="text" 
-              name="full_name"
-              value={isEditing ? editForm.full_name : (user.full_name || '')} 
+              name="first_name"
+              value={isEditing ? editForm.first_name : (user.first_name || '')} 
               onChange={handleEditChange}
               readOnly={!isEditing}
-              placeholder="Enter your full name"
+              placeholder="Enter your first name"
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Last Name</label>
+            <input 
+              type="text" 
+              name="last_name"
+              value={isEditing ? editForm.last_name : (user.last_name || '')} 
+              onChange={handleEditChange}
+              readOnly={!isEditing}
+              placeholder="Enter your last name"
             />
           </div>
           

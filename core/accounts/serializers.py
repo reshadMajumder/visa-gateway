@@ -12,7 +12,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'password2', 'full_name', 'phone_number',
+        fields = ('email', 'username', 'password', 'password2', 'first_name','last_name', 'phone_number',
                  'date_of_birth', 'address', 'profile_picture')
 
     def validate_email(self, value):
@@ -64,19 +64,35 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             return cleaned_number
         return value
 
-    def validate_full_name(self, value):
+    def validate_first_name(self, value):
         """
         Validate full name format
         """
         if len(value.strip()) < 2:
-            raise serializers.ValidationError("Full name must be at least 2 characters long.")
+            raise serializers.ValidationError("First name must be at least 2 characters long.")
         
         if not re.match(r'^[a-zA-Z\s\'-]+$', value):
             raise serializers.ValidationError(
-                "Full name can only contain letters, spaces, hyphens, and apostrophes."
+                "First name can only contain letters, spaces, hyphens, and apostrophes."
             )
         
         return value.strip()
+
+    
+    def validate_last_name(self, value):
+        """
+        Validate full name format
+        """
+        if len(value.strip()) < 2:
+            raise serializers.ValidationError("Last name must be at least 2 characters long.")
+        
+        if not re.match(r'^[a-zA-Z\s\'-]+$', value):
+            raise serializers.ValidationError(
+                "Last name can only contain letters, spaces, hyphens, and apostrophes."
+            )
+        
+        return value.strip()
+
 
     def validate_date_of_birth(self, value):
         """
@@ -162,7 +178,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'full_name', 'phone_number',
+        fields = ('id', 'email', 'username', 'first_name','last_name', 'phone_number',
                  'date_of_birth', 'address', 'profile_picture', 'is_active',
                  'created_at', 'updated_at')
         read_only_fields = ('id', 'created_at', 'updated_at')
@@ -170,5 +186,5 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserResponseSerializer(UserSerializer):
     class Meta(UserSerializer.Meta):
-        fields = ('id', 'email', 'username', 'full_name','profile_picture')
-        read_only_fields = ('id','email', 'username', 'full_name','profile_picture')
+        fields = ('id', 'email', 'username', 'first_name','last_name','profile_picture')
+        read_only_fields = ('id','email', 'username', 'first_name','last_name','profile_picture')

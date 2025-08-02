@@ -6,7 +6,8 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    full_name: '',
+    first_name: '',
+    last_name: '',
     password: '',
     confirm_password: ''
   })
@@ -42,7 +43,8 @@ const Signup = () => {
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
-          full_name: formData.full_name,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
           password: formData.password,
           password2: formData.confirm_password,
         })
@@ -111,15 +113,28 @@ const Signup = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="full_name">Full Name</label>
+            <label htmlFor="first_name">First Name</label>
             <input
               type="text"
-              id="full_name"
-              name="full_name"
-              value={formData.full_name}
+              id="first_name"
+              name="first_name"
+              value={formData.first_name}
               onChange={handleChange}
               required
-              placeholder="Enter your full name"
+              placeholder="Enter your first name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="last_name">Last Name</label>
+            <input
+              type="text"
+              id="last_name"
+              name="last_name"
+              value={formData.last_name}
+              onChange={handleChange}
+              required
+              placeholder="Enter your last name"
             />
           </div>
 

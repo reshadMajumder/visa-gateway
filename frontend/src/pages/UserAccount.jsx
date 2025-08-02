@@ -51,7 +51,8 @@ const UserAccount = () => {
         // Initialize edit form with current user data
         setEditForm({
           email: userData.email || '',
-          full_name: userData.full_name || '',
+          first_name: userData.first_name || '',
+          last_name: userData.last_name || '',
           phone_number: userData.phone_number || '',
           date_of_birth: userData.date_of_birth || '',
           address: userData.address || ''
@@ -199,7 +200,8 @@ const UserAccount = () => {
         // Update edit form with new data
         setEditForm({
           email: updatedUser.email || '',
-          full_name: updatedUser.full_name || '',
+          first_name: updatedUser.first_name || '',
+          last_name: updatedUser.last_name || '',
           phone_number: updatedUser.phone_number || '',
           date_of_birth: updatedUser.date_of_birth || '',
           address: updatedUser.address || ''
@@ -227,7 +229,8 @@ const UserAccount = () => {
     // Reset edit form to current user data
     setEditForm({
       email: user?.email || '',
-      full_name: user?.full_name || '',
+      first_name: user?.first_name || '',
+      last_name: user?.last_name || '',
       phone_number: user?.phone_number || '',
       date_of_birth: user?.date_of_birth || '',
       address: user?.address || ''
@@ -289,7 +292,7 @@ const UserAccount = () => {
                 )}
               </div>
               <div className="user-details">
-                <h1>Welcome back, {user.full_name || user.username}</h1>
+                <h1>Welcome back, {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}</h1>
                 <p>Member since {new Date(user.created_at).toLocaleDateString()}</p>
               </div>
             </div>
