@@ -146,9 +146,9 @@ const Navbar = () => {
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                   >
                     <div className="profile-avatar">
-                      {user?.full_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
+                      {user?.first_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
                     </div>
-                    <span className="profile-name">{user?.full_name || user?.username}</span>
+                    <span className="profile-name">{user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.username}</span>
                     <span className="dropdown-arrow">▼</span>
                   </button>
                   {isProfileDropdownOpen && (
