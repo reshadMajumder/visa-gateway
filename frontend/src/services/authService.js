@@ -21,7 +21,8 @@ const register = async (userData) => {
             username: userData.email.split('@')[0], // Generate username from email
             password: userData.password,
             password2: userData.confirmPassword,
-            full_name: `${userData.firstName} ${userData.lastName}`,
+            first_name: userData.firstName,
+            last_name: userData.lastName,
             phone_number: userData.phone
         });
         return response.data;
