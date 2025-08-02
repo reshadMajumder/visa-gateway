@@ -197,3 +197,19 @@ CORS_ALLOW_ALL_ORIGINS = True  # Only for development, configure properly for pr
 CORS_ALLOW_CREDENTIALS = True
 if not DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://spring.rexhad.co",
+]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://spring.rexhad.co",
+    'http://localhost:3000',
+    'http://localhost:5173',
+
+
+
+]
