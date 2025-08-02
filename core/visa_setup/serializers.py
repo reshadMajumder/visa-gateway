@@ -133,7 +133,8 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
         return {
             'id': obj.user.id,
             'username': obj.user.username,
-            'full_name': obj.user.full_name
+            'first_name': obj.user.first_name,
+            'last_name': obj.user.last_name
         }
         
 
