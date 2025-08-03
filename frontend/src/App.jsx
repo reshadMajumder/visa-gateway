@@ -14,13 +14,12 @@ import Contact from './pages/Contact'
 import UserAccount from './pages/UserAccount'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import Footer from './components/Footer'
-import './App.css'
 
 function App() {
   return (
-    <div className="App">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-      <main>
+      <main className="flex-1 pt-20">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

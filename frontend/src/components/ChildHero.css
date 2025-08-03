@@ -1,10 +1,10 @@
-/* ChildHero CSS - Dynamic Hero Component */
+/* ChildHero Component Styles */
 .child-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 0;
+  text-align: center;
   position: relative;
-  min-height: 3000px;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-  display: flex;
-  align-items: center;
   overflow: hidden;
 }
 
@@ -15,241 +15,64 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(248, 250, 252, 0.95) 0%, 
-    rgba(226, 232, 240, 0.9) 50%, 
-    rgba(203, 213, 225, 0.85) 100%);
+  background: rgba(0, 0, 0, 0.3);
   z-index: 1;
 }
 
-.hero-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-}
-
-.hero-background img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.3;
-}
-
-.hero-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(248, 250, 252, 0.8) 0%, 
-    rgba(226, 232, 240, 0.7) 50%, 
-    rgba(203, 213, 225, 0.6) 100%);
-}
-
-.hero-content {
+.child-hero-content {
   position: relative;
   z-index: 2;
-  width: 100%;
-  padding: 3rem 0;
-}
-
-.container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
 }
 
-.hero-back-button {
-  background: rgba(255, 255, 255, 0.9);
-  color: #374151;
-  border: 1px solid rgba(203, 213, 225, 0.5);
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 0.9rem;
+.child-hero h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.child-hero p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.child-hero-button {
+  background-color: #3b82f6;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.125rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.hero-back-button:hover {
-  background: rgba(255, 255, 255, 1);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.hero-text-content {
-  max-width: 800px;
-}
-
-.hero-icon {
+  text-decoration: none;
   display: inline-block;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  opacity: 0.8;
 }
 
-.hero-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 1rem 0;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #475569;
-  margin: 0 0 1rem 0;
-  line-height: 1.4;
-}
-
-.hero-description {
-  font-size: 1.1rem;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.6;
-  font-weight: 400;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .child-hero {
-    min-height: 250px;
-  }
-  
-  .hero-content {
-    padding: 2rem 0;
-  }
-  
-  .hero-title {
-    font-size: 2rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .hero-description {
-    font-size: 1rem;
-  }
+.child-hero-button:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 @media (max-width: 768px) {
   .child-hero {
-    min-height: 200px;
+    padding: 2rem 0;
   }
   
-  .hero-content {
-    padding: 1.5rem 0;
-  }
-  
-  .container {
-    padding: 0 1rem;
-  }
-  
-  .hero-back-button {
-    padding: 8px 12px;
-    font-size: 0.8rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .hero-title {
-    font-size: 1.75rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1rem;
-  }
-  
-  .hero-description {
-    font-size: 0.9rem;
-  }
-  
-  .hero-icon {
+  .child-hero h1 {
     font-size: 2rem;
   }
-}
-
-@media (max-width: 480px) {
-  .child-hero {
-    min-height: 180px;
-  }
   
-  .hero-content {
-    padding: 1rem 0;
+  .child-hero p {
+    font-size: 1rem;
   }
-  
-  .hero-back-button {
-    padding: 6px 10px;
-    font-size: 0.75rem;
-    margin-bottom: 1rem;
-  }
-  
-  .hero-title {
-    font-size: 1.5rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 0.9rem;
-  }
-  
-  .hero-description {
-    font-size: 0.85rem;
-  }
-  
-  .hero-icon {
-    font-size: 1.75rem;
-  }
-}
-
-/* Custom variations */
-.child-hero.hero-primary {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%, #93c5fd 100%);
-}
-
-.child-hero.hero-secondary {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
-}
-
-.child-hero.hero-success {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
-}
-
-.child-hero.hero-warning {
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #fde68a 100%);
-}
-
-.child-hero.hero-dark {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
-}
-
-.child-hero.hero-dark .hero-title {
-  color: #f8fafc;
-}
-
-.child-hero.hero-dark .hero-subtitle {
-  color: #cbd5e1;
-}
-
-.child-hero.hero-dark .hero-description {
-  color: #94a3b8;
-}
-
-.child-hero.hero-dark .hero-back-button {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f8fafc;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.child-hero.hero-dark .hero-back-button:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
