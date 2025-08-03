@@ -210,3 +210,105 @@ class CountryVisaTypeSerializer(serializers.ModelSerializer):
             visa_type.required_documents.set(required_document_ids)
 
         return visa_type
+
+
+
+
+
+
+class UserVisaApplicationSerializer(serializers.ModelSerializer):
+    # Read-only detailed views
+    country = serializers.SerializerMethodField(read_only=True)
+    visa_type = serializers.SerializerMethodField(read_only=True)
+    user = serializers.SerializerMethodField(read_only=True)
+
+    # Write-only fields for input
+    country_id = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), write_only=True)
+    visa_type_id = serializers.PrimaryKeyRelatedField(queryset=VisaType.objects.all(), write_only=True)
+
+    class Meta:
+        model = VisaApplication
+        fields = [
+            'id', 'country', 'country_id', 'visa_type', 'visa_type_id', 'user',
+            'status', 'admin_notes', 'rejection_reason',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+
+    def get_country(self, obj):
+        return {
+            'id': obj.country.id,
+            'name': obj.country.name,
+            'image': obj.country.image.url if obj.country.image else None
+        }
+
+    def get_visa_type(self, obj):
+        required_documents = []
+        # validate the file size and type pdf, docx, doc, jpg, jpeg, png
+        
+
+        uploaded_docs = {
+            doc.required_document.id: doc for doc in obj.documents.all()
+        }
+
+        for doc in obj.visa_type.required_documents.all():
+            uploaded = uploaded_docs.get(doc.id)
+            required_documents.append({
+                'id': doc.id,
+                'document_name': doc.document_name,
+                'description': doc.description,
+                'document_file': uploaded.file.url if uploaded and uploaded.file else None,
+                'status': uploaded.status if uploaded else 'not_uploaded',
+                'admin_notes': uploaded.admin_notes if uploaded else '',
+                'rejection_reason': uploaded.rejection_reason if uploaded else '',
+            })
+
+        return {
+            'id': obj.visa_type.id,
+            'name': obj.visa_type.name,
+            'image': obj.visa_type.image.url if obj.visa_type.image else None,
+            'required_documents': required_documents
+        }
+
+    def get_user(self, obj):
+        return {
+            'id': obj.user.id,
+            'username': obj.user.username,
+        }
+
+    def create(self, validated_data):
+        request = self.context['request']
+        user = request.user
+
+        country = validated_data.pop('country_id')
+        visa_type = validated_data.pop('visa_type_id')
+
+        application = VisaApplication.objects.create(
+            user=user,
+            country=country,
+            visa_type=visa_type,
+            status=validated_data.get('status', 'draft'),
+            admin_notes=validated_data.get('admin_notes', ''),
+            rejection_reason=validated_data.get('rejection_reason', ''),
+        )
+
+        # Handle uploaded files
+        for key, file in request.FILES.items():
+            if key.startswith("required_documents["):
+                # validate the file size and type pdf, docx, doc, jpg, jpeg, png
+                if file.size > 1024 * 1024 * 10:
+                    raise serializers.ValidationError("File size cannot exceed 10MB")
+                if not (file.name.endswith('.pdf') or file.name.endswith('.docx') or file.name.endswith('.doc') or file.name.endswith('.jpg') or file.name.endswith('.jpeg') or file.name.endswith('.png')):
+                    raise serializers.ValidationError("File type is not allowed")
+                doc_id = key.split("[")[1].split("]")[0]
+                try:
+                    required_doc = RequiredDocuments.objects.get(id=doc_id)
+                    ApplicationDocument.objects.create(
+                        application=application,
+                        required_document=required_doc,
+                        file=file
+                    )
+                except RequiredDocuments.DoesNotExist:
+                    continue
+
+        return application

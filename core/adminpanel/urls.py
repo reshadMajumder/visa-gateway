@@ -10,6 +10,7 @@ from .views import (
     CountryVisaTypesView, CountryVisaTypeDetailView,
     VisaTypeFormDataView, CountryFormDataView,
     CountriesWithVisaTypesView, BulkVisaTypeAssignmentView,
+    UserVisaApplicationView,
 )
 
 urlpatterns = [
@@ -46,4 +47,8 @@ urlpatterns = [
     # Utility endpoints for form data
     path('form-data/visa-type/', VisaTypeFormDataView.as_view()),
     path('form-data/country/', CountryFormDataView.as_view()),
+
+    path('visa-applications/', UserVisaApplicationView.as_view(), name='visa-application-list'),
+    path('visa-applications/<int:application_id>/', UserVisaApplicationView.as_view(), name='visa-application-detail'),
+
 ]

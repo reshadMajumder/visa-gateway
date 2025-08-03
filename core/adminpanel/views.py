@@ -4,16 +4,18 @@ from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.permissions import AllowAny
 from .permissions import IsSuperUser
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from django.shortcuts import get_object_or_404
-from visa_setup.models import Notes, VisaProcess, VisaOverview, RequiredDocuments,Country, VisaType
+from visa_setup.models import Notes, VisaProcess, VisaOverview, RequiredDocuments,Country, VisaType,VisaApplication,ApplicationDocument
 from .serializers import (
     AdminUserSerializer,
     NotesSerializer,
     VisaProcessSerializer,
     VisaOverviewSerializer,
     RequiredDocumentsSerializer,
-    CountrySerializer, VisaTypeSerializer, CountryVisaTypeSerializer
+    CountrySerializer, VisaTypeSerializer, CountryVisaTypeSerializer,
+    UserVisaApplicationSerializer
 )
 
 class AdminLoginView(APIView):
@@ -447,3 +449,197 @@ class BulkVisaTypeAssignmentView(APIView):
             return Response({"error": "Invalid visa_type_ids format. Use comma-separated integers."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+class UserVisaApplicationView(APIView):
+    permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get(self, request, application_id=None):
+        """Get all visa applications or specific application for admin with documents"""
+        if application_id:
+            try:
+                visa_application = VisaApplication.objects.filter(
+                    id=application_id
+                ).select_related(
+                    'country', 'visa_type', 'user'
+                ).prefetch_related('documents__required_document').first()
+                
+                if not visa_application:
+                    return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
+                
+                serializer = UserVisaApplicationSerializer(visa_application)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            """Get all visa applications for admin with documents"""
+            visa_applications = VisaApplication.objects.all().select_related(
+                'country', 'visa_type', 'user'
+            ).prefetch_related('documents__required_document').order_by('-created_at')
+            serializer = UserVisaApplicationSerializer(visa_applications, many=True)
+            return Response({"message":"Applications fetched successfully", "Applications":serializer.data}, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = UserVisaApplicationSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            visa_application = serializer.save()
+            return Response({
+                "message": "Application created successfully",
+                "Application": UserVisaApplicationSerializer(visa_application).data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, application_id=None):
+        """Update application status, admin notes, rejection reason, and/or documents"""
+        if not application_id:
+            return Response({'error': 'Application ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            app = VisaApplication.objects.get(pk=application_id)
+        except VisaApplication.DoesNotExist:
+            return Response({'error': 'Application not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        updated = False
+        update_data = {}
+
+        # Handle form data updates (status, admin_notes, rejection_reason)
+        if 'status' in request.data:
+            update_data['status'] = request.data['status']
+            updated = True
+        
+        if 'admin_notes' in request.data:
+            update_data['admin_notes'] = request.data['admin_notes']
+            updated = True
+        
+        if 'rejection_reason' in request.data:
+            update_data['rejection_reason'] = request.data['rejection_reason']
+            updated = True
+
+        # Update application fields if provided
+        if update_data:
+            for field, value in update_data.items():
+                setattr(app, field, value)
+            app.save()
+
+        # Handle individual document status and notes updates
+        for key, value in request.data.items():
+            if key.startswith("document_status["):
+                try:
+                    doc_id = int(key.split("[")[1].split("]")[0])
+                    # Find the ApplicationDocument for this required document
+                    try:
+                        app_doc = ApplicationDocument.objects.get(
+                            application=app,
+                            required_document_id=doc_id
+                        )
+                        app_doc.status = value
+                        app_doc.save()
+                        updated = True
+                    except ApplicationDocument.DoesNotExist:
+                        # Document not uploaded yet, skip status update
+                        continue
+                except (IndexError, ValueError):
+                    continue
+
+            elif key.startswith("document_admin_notes["):
+                try:
+                    doc_id = int(key.split("[")[1].split("]")[0])
+                    # Find the ApplicationDocument for this required document
+                    try:
+                        app_doc = ApplicationDocument.objects.get(
+                            application=app,
+                            required_document_id=doc_id
+                        )
+                        app_doc.admin_notes = value
+                        app_doc.save()
+                        updated = True
+                    except ApplicationDocument.DoesNotExist:
+                        # Document not uploaded yet, skip notes update
+                        continue
+                except (IndexError, ValueError):
+                    continue
+
+            elif key.startswith("document_rejection_reason["):
+                try:
+                    doc_id = int(key.split("[")[1].split("]")[0])
+                    # Find the ApplicationDocument for this required document
+                    try:
+                        app_doc = ApplicationDocument.objects.get(
+                            application=app,
+                            required_document_id=doc_id
+                        )
+                        app_doc.rejection_reason = value
+                        app_doc.save()
+                        updated = True
+                    except ApplicationDocument.DoesNotExist:
+                        # Document not uploaded yet, skip rejection reason update
+                        continue
+                except (IndexError, ValueError):
+                    continue
+
+        # Handle file uploads
+        for key in request.FILES:
+            if key.startswith("required_documents["):
+                try:
+                    doc_id = int(key.split("[")[1].split("]")[0])
+                except (IndexError, ValueError):
+                    continue  # skip invalid keys
+
+                file = request.FILES[key]
+
+                # Validate file size and type
+                if file.size > 1024 * 1024 * 10:  # 10MB limit
+                    return Response({'error': 'File size cannot exceed 10MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.pdf', '.docx', '.doc', '.jpg', '.jpeg', '.png']
+                if not any(file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'File type not allowed. Use PDF, DOCX, DOC, JPG, JPEG, or PNG'}, status=status.HTTP_400_BAD_REQUEST)
+
+                try:
+                    required_doc = RequiredDocuments.objects.get(id=doc_id)
+                except RequiredDocuments.DoesNotExist:
+                    return Response({'error': f'Required document with ID {doc_id} does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+                # Update or create ApplicationDocument
+                app_doc, created = ApplicationDocument.objects.get_or_create(
+                    application=app,
+                    required_document=required_doc,
+                    defaults={'file': file}
+                )
+
+                if not created:
+                    app_doc.file = file
+                    app_doc.status = 'pending'  # Reset status after upload
+                    app_doc.admin_notes = ''
+                    app_doc.rejection_reason = ''
+                    app_doc.save()
+
+                updated = True
+
+        if updated:
+            return Response({
+                'message': 'Application updated successfully',
+                'application': UserVisaApplicationSerializer(app).data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'No valid data provided for update'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, application_id=None):
+        """Delete a visa application"""
+        if not application_id:
+            return Response({'error': 'Application ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            app = VisaApplication.objects.get(pk=application_id)
+            app.delete()
+            return Response({'message': 'Application deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except VisaApplication.DoesNotExist:
+            return Response({'error': 'Application not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': f'Error deleting application: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
