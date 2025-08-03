@@ -14,6 +14,10 @@ db.sqlite3
 .DS_Store
 Thumbs.db
 
+migrations/
+
 
 media/
 static/
+.env
+.env/
