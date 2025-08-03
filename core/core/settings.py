@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',  # <-- Added for blacklist support
     'visa_setup',
     'accounts',
+    'adminpanel',
 ]
 
 
