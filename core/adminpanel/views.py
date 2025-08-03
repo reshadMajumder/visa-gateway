@@ -13,7 +13,7 @@ from .serializers import (
     VisaProcessSerializer,
     VisaOverviewSerializer,
     RequiredDocumentsSerializer,
-    CountrySerializer, VisaTypeSerializer
+    CountrySerializer, VisaTypeSerializer, CountryVisaTypeSerializer
 )
 
 class AdminLoginView(APIView):
@@ -233,9 +233,6 @@ class RequiredDocumentsDetailView(APIView):
 
 
 
-
-
-
 # ---------------- Country ----------------
 
 class CountryListCreateView(APIView):
@@ -312,3 +309,141 @@ class VisaTypeDetailView(APIView):
         visa_type = get_object_or_404(VisaType, pk=pk)
         visa_type.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---------------- Country Visa Types ----------------
+
+class CountryVisaTypesView(APIView):
+    permission_classes = [IsSuperUser]
+
+    def get(self, request, country_id):
+        """Get all visa types for a specific country"""
+        country = get_object_or_404(Country, pk=country_id)
+        visa_types = country.types.all()
+        serializer = VisaTypeSerializer(visa_types, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, country_id):
+        """Create a new visa type and associate it with the country"""
+        country = get_object_or_404(Country, pk=country_id)
+        serializer = CountryVisaTypeSerializer(data=request.data)
+        if serializer.is_valid():
+            visa_type = serializer.save()
+            # Associate the visa type with the country
+            country.types.add(visa_type)
+            return Response(VisaTypeSerializer(visa_type).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CountryVisaTypeDetailView(APIView):
+    permission_classes = [IsSuperUser]
+
+    def get(self, request, country_id, visa_type_id):
+        """Get a specific visa type for a country"""
+        country = get_object_or_404(Country, pk=country_id)
+        visa_type = get_object_or_404(VisaType, pk=visa_type_id)
+        
+        # Check if the visa type belongs to the country
+        if visa_type not in country.types.all():
+            return Response({"error": "Visa type not found for this country"}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(VisaTypeSerializer(visa_type).data)
+
+    def put(self, request, country_id, visa_type_id):
+        """Update a visa type for a country"""
+        country = get_object_or_404(Country, pk=country_id)
+        visa_type = get_object_or_404(VisaType, pk=visa_type_id)
+        
+        # Check if the visa type belongs to the country
+        if visa_type not in country.types.all():
+            return Response({"error": "Visa type not found for this country"}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = VisaTypeSerializer(visa_type, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(VisaTypeSerializer(visa_type).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, country_id, visa_type_id):
+        """Remove a visa type from a country (but don't delete the visa type itself)"""
+        country = get_object_or_404(Country, pk=country_id)
+        visa_type = get_object_or_404(VisaType, pk=visa_type_id)
+        
+        # Check if the visa type belongs to the country
+        if visa_type not in country.types.all():
+            return Response({"error": "Visa type not found for this country"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Remove the visa type from the country
+        country.types.remove(visa_type)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---------------- Utility Views for Admin Interface ----------------
+
+class VisaTypeFormDataView(APIView):
+    """Get all available data for creating/editing visa types"""
+    permission_classes = [IsSuperUser]
+
+    def get(self, request):
+        """Get all available processes, overviews, notes, and documents for visa type creation"""
+        data = {
+            'processes': VisaProcessSerializer(VisaProcess.objects.all(), many=True).data,
+            'overviews': VisaOverviewSerializer(VisaOverview.objects.all(), many=True).data,
+            'notes': NotesSerializer(Notes.objects.all(), many=True).data,
+            'required_documents': RequiredDocumentsSerializer(RequiredDocuments.objects.all(), many=True).data,
+        }
+        return Response(data)
+
+
+class CountryFormDataView(APIView):
+    """Get all available data for creating/editing countries"""
+    permission_classes = [IsSuperUser]
+
+    def get(self, request):
+        """Get all available visa types for country creation"""
+        data = {
+            'visa_types': VisaTypeSerializer(VisaType.objects.all(), many=True).data,
+        }
+        return Response(data)
+
+
+class CountriesWithVisaTypesView(APIView):
+    """Get all countries with their visa types in a nested format"""
+    permission_classes = [IsSuperUser]
+
+    def get(self, request):
+        """Get all countries with their associated visa types"""
+        countries = Country.objects.prefetch_related('types').all()
+        serializer = CountrySerializer(countries, many=True)
+        return Response(serializer.data)
+
+
+class BulkVisaTypeAssignmentView(APIView):
+    """Bulk assign visa types to a country"""
+    permission_classes = [IsSuperUser]
+
+    def post(self, request, country_id):
+        """Assign multiple visa types to a country at once"""
+        country = get_object_or_404(Country, pk=country_id)
+        visa_type_ids = request.data.get('visa_type_ids', '')
+        
+        if not visa_type_ids:
+            return Response({"error": "visa_type_ids is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Handle string input for visa_type_ids (form-data)
+        try:
+            if isinstance(visa_type_ids, str):
+                ids = [int(x.strip()) for x in visa_type_ids.split(',') if x.strip()]
+            else:
+                ids = visa_type_ids
+            
+            visa_types = VisaType.objects.filter(id__in=ids)
+            country.types.add(*visa_types)
+            return Response({
+                "message": f"Successfully assigned {len(visa_types)} visa types to {country.name}",
+                "assigned_count": len(visa_types)
+            }, status=status.HTTP_200_OK)
+        except ValueError:
+            return Response({"error": "Invalid visa_type_ids format. Use comma-separated integers."}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
