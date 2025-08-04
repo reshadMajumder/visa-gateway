@@ -1,7 +1,24 @@
 import { useState, useEffect } from 'react'
 import VisaApplicationCard from '../components/VisaApplicationCard'
 import UserProfile from './UserProfile'
-import './css/UserAccount.css'
+import { 
+  User, 
+  BarChart3, 
+  FileText, 
+  Clock, 
+  CheckCircle, 
+  XCircle, 
+  AlertCircle,
+  RefreshCw,
+  Plus,
+  Settings,
+  Bell,
+  Shield,
+  Calendar,
+  UserCircle,
+  FileEdit,
+  Globe
+} from 'lucide-react'
 
 const UserAccount = () => {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -248,10 +265,13 @@ const UserAccount = () => {
 
   if (loading) {
     return (
-      <div className="user-account-page">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Loading your profile...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Loading Your Profile</h3>
+          <p className="text-gray-600">Please wait while we fetch your account details...</p>
         </div>
       </div>
     )
@@ -259,10 +279,20 @@ const UserAccount = () => {
 
   if (error) {
     return (
-      <div className="user-account-page">
-        <div className="error-container">
-          <p className="error-message">{error}</p>
-          <button onClick={fetchUserProfile} className="retry-button">Try Again</button>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">Something went wrong</h3>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button 
+            onClick={fetchUserProfile} 
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-300 flex items-center space-x-2 mx-auto"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Try Again</span>
+          </button>
         </div>
       </div>
     )
@@ -270,145 +300,229 @@ const UserAccount = () => {
 
   if (!user) {
     return (
-      <div className="user-account-page">
-        <div className="error-container">
-          <p className="error-message">No user data found. Please login again.</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-100 flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-gray-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">No Profile Found</h3>
+          <p className="text-gray-600 mb-6">No user data found. Please login again to continue.</p>
+          <button 
+            onClick={() => window.location.href = '/login'} 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-300"
+          >
+            Go to Login
+          </button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="user-account-page">
-      <div className="account-header">
-        <div className="container">
-          <div className="header-content">
-            <div className="user-info">
-              <div className="user-avatar">
-                {user.profile_picture ? (
-                  <img src={`http://127.0.0.1:8000${user.profile_picture}`} alt="Profile" />
-                ) : (
-                <span className="avatar-icon">👤</span>
-                )}
-              </div>
-              <div className="user-details">
-                <h1>Welcome back, {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}</h1>
-                <p>Member since {new Date(user.created_at).toLocaleDateString()}</p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Header Section */}
+      <div className="bg-white shadow-lg border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center space-x-6">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
+              {user.profile_picture ? (
+                <img 
+                  src={`http://127.0.0.1:8000${user.profile_picture}`} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-10 h-10 text-white" />
+              )}
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Welcome back, {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}!
+              </h1>
+              <p className="text-gray-600 mt-1 flex items-center space-x-2">
+                <Calendar className="w-4 h-4" />
+                <span>Member since {new Date(user.created_at).toLocaleDateString()}</span>
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container">
-        <div className="account-content">
-          <div className="account-tabs">
-            <button 
-              className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tab Navigation */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 mb-8">
+          <div className="flex flex-wrap gap-2 sm:gap-4">
+            <button
               onClick={() => setActiveTab('dashboard')}
+              className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 ${
+                activeTab === 'dashboard'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg transform scale-105'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+              }`}
             >
-              Dashboard
+              <BarChart3 className="w-5 h-5" />
+              <span>Dashboard</span>
             </button>
-            <button 
-              className={`tab-button ${activeTab === 'profile' ? 'active' : ''}`}
+            
+            <button
               onClick={() => setActiveTab('profile')}
+              className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 ${
+                activeTab === 'profile'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg transform scale-105'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 hover:text-gray-800'
+              }`}
             >
-              Profile
+              <UserCircle className="w-5 h-5" />
+              <span>Profile Settings</span>
             </button>
           </div>
+        </div>
 
+        {/* Content Area */}
+        <div className="space-y-8">
           {activeTab === 'dashboard' && (
-            <div className="dashboard-content">
-              <div className="stats-overview">
-                <div className="stat-card">
-                  <div className="stat-icon">📊</div>
-                  <div className="stat-info">
-                    <h3>{applications.length}</h3>
-                    <p>Total Applications</p>
+            <div className="space-y-8">
+              {/* Statistics Overview */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                      <BarChart3 className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">{applications.length}</p>
+                      <p className="text-gray-600 text-sm">Total Applications</p>
+                    </div>
                   </div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-icon">📄</div>
-                  <div className="stat-info">
-                    <h3>{applications.filter(app => app.status === 'draft').length}</h3>
-                    <p>Draft</p>
+
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                      <FileEdit className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">{applications.filter(app => app.status === 'draft').length}</p>
+                      <p className="text-gray-600 text-sm">Draft</p>
+                    </div>
                   </div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-icon">⏳</div>
-                  <div className="stat-info">
-                    <h3>{applications.filter(app => app.status === 'submitted').length}</h3>
-                    <p>Submitted</p>
+
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">{applications.filter(app => app.status === 'submitted').length}</p>
+                      <p className="text-gray-600 text-sm">Submitted</p>
+                    </div>
                   </div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-icon">✅</div>
-                  <div className="stat-info">
-                    <h3>{applications.filter(app => app.status === 'approved').length}</h3>
-                    <p>Approved</p>
+
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">{applications.filter(app => app.status === 'approved').length}</p>
+                      <p className="text-gray-600 text-sm">Approved</p>
+                    </div>
                   </div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-icon">❌</div>
-                  <div className="stat-info">
-                    <h3>{applications.filter(app => app.status === 'rejected').length}</h3>
-                    <p>Rejected</p>
+
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition-all duration-300">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center">
+                      <XCircle className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900">{applications.filter(app => app.status === 'rejected').length}</p>
+                      <p className="text-gray-600 text-sm">Rejected</p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="visa-applications">
-                <div className="applications-header">
-                <h2>Your Visa Applications</h2>
-                  {applicationsLoading && (
-                    <div className="loading-indicator">
-                      <div className="loading-spinner small"></div>
-                      <span>Loading applications...</span>
-                          </div>
-                        )}
+              {/* Applications Section */}
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <FileText className="w-6 h-6 text-white" />
+                      <h2 className="text-2xl font-bold text-white">Your Visa Applications</h2>
+                    </div>
+                    {applicationsLoading && (
+                      <div className="flex items-center space-x-2 text-white">
+                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        <span>Loading applications...</span>
                       </div>
+                    )}
+                  </div>
+                </div>
 
-                {!applicationsLoading && applications.length === 0 && (
-                  <div className="no-applications">
-                    <div className="no-applications-icon">📋</div>
-                    <h3>No Applications Yet</h3>
-                    <p>You haven't submitted any visa applications yet.</p>
-                    <button className="primary-button" onClick={() => window.location.href = '/'}>
-                      Apply for Visa
-                    </button>
-                              </div>
-                )}
+                <div className="p-6">
+                  {!applicationsLoading && applications.length === 0 && (
+                    <div className="text-center py-12">
+                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FileText className="w-10 h-10 text-gray-400" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800 mb-2">No Applications Yet</h3>
+                      <p className="text-gray-600 mb-6">You haven't submitted any visa applications yet. Start your journey today!</p>
+                      <button 
+                        onClick={() => window.location.href = '/'} 
+                        className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-lg flex items-center space-x-2 mx-auto"
+                      >
+                        <Globe className="w-5 h-5" />
+                        <span>Apply for Visa</span>
+                      </button>
+                    </div>
+                  )}
 
-                {!applicationsLoading && applications.length > 0 && (
-                  <div className="applications-grid">
-                    {applications.map((application) => (
-                      <VisaApplicationCard
-                        key={application.id}
-                        application={application}
-                        onUploadSuccess={handleUploadSuccess}
-                        onUploadError={handleUploadError}
-                      />
-                          ))}
+                  {!applicationsLoading && applications.length > 0 && (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {applications.map((application) => (
+                        <div key={application.id} className="transform hover:scale-105 transition-transform duration-300">
+                          <VisaApplicationCard
+                            application={application}
+                            onUploadSuccess={handleUploadSuccess}
+                            onUploadError={handleUploadError}
+                          />
                         </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
 
           {activeTab === 'profile' && (
-            <UserProfile 
-              user={user}
-              error={error}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-              editForm={editForm}
-              setEditForm={setEditForm}
-              saving={saving}
-              handleEditChange={handleEditChange}
-              handleFileChange={handleFileChange}
-              handleEditSubmit={handleEditSubmit}
-              handleEditCancel={handleEditCancel}
-            />
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+                <h2 className="text-2xl font-bold text-white flex items-center space-x-3">
+                  <Settings className="w-6 h-6" />
+                  <span>Profile Settings</span>
+                </h2>
+                <p className="text-blue-100 mt-2">Update your personal information and preferences</p>
+              </div>
+              <div className="p-6">
+                <UserProfile 
+                  user={user}
+                  error={error}
+                  isEditing={isEditing}
+                  setIsEditing={setIsEditing}
+                  editForm={editForm}
+                  setEditForm={setEditForm}
+                  saving={saving}
+                  handleEditChange={handleEditChange}
+                  handleFileChange={handleFileChange}
+                  handleEditSubmit={handleEditSubmit}
+                  handleEditCancel={handleEditCancel}
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>

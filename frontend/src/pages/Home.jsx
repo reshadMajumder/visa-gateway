@@ -61,20 +61,20 @@ const Home = () => {
   ]
 
   return (
-    <div className="bg-white">
+    <div className="min-h-screen w-full bg-white">
       {/* Hero Section - Keep existing Banner */}
       <Banner />
       
       {/* Stats Section */}
-      <section className="py-16 bg-white">
+      <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
+              <div key={index} className="text-center py-4">
                 <div className="text-3xl md:text-4xl font-bold text-primary-800 mb-2">
                   {stat.number}
                 </div>
-                <div className="text-gray-600 font-medium">
+                <div className="text-gray-600 font-medium text-sm md:text-base">
                   {stat.label}
                 </div>
               </div>
@@ -84,7 +84,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-primary-800 mb-4">
@@ -95,21 +95,23 @@ const Home = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="bg-white p-6 rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 text-center group hover:-translate-y-1"
+                className="bg-white p-6 rounded-xl shadow-soft hover:shadow-medium transition-all duration-300 text-center group hover:-translate-y-1 min-h-[280px] flex flex-col justify-between"
               >
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition-colors">
-                  <feature.icon className="w-8 h-8 text-primary-600" />
+                <div className="flex-1">
+                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition-colors">
+                    <feature.icon className="w-8 h-8 text-primary-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-primary-800 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-primary-800 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  {feature.description}
-                </p>
               </div>
             ))}
           </div>
@@ -131,21 +133,23 @@ const Home = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {services.map((service, index) => (
               <div 
                 key={index}
-                className="p-8 border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-lg transition-all duration-300"
+                className="p-8 border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-lg transition-all duration-300 min-h-[250px] flex flex-col"
               >
-                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                  <service.icon className="w-6 h-6 text-primary-600" />
+                <div className="flex-1">
+                  <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+                    <service.icon className="w-6 h-6 text-primary-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-primary-800 mb-3">
+                    {service.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {service.description}
+                  </p>
                 </div>
-                <h3 className="text-xl font-semibold text-primary-800 mb-3">
-                  {service.title}
-                </h3>
-                <p className="text-gray-600">
-                  {service.description}
-                </p>
               </div>
             ))}
           </div>
@@ -153,19 +157,19 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-primary-800 text-white">
+      <section className="py-16 bg-slate-800 text-white mb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Start Your Visa Application?
           </h2>
-          <p className="text-xl text-primary-200 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Join thousands of satisfied customers who have successfully obtained their visas with our expert assistance.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-primary-800 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors w-full sm:w-auto">
               Get Started Now
             </button>
-            <button className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-800 transition-colors">
+            <button className="border border-gray-300 text-gray-300 px-8 py-3 rounded-lg font-semibold hover:bg-gray-300 hover:text-slate-800 transition-colors w-full sm:w-auto">
               Learn More
             </button>
           </div>

@@ -2,8 +2,8 @@ import './Banner.css'
 
 const Banner = () => {
   return (
-    <section className="banner">
-      <div className="banner-overlay">
+    <section className="banner container mx-auto bg-red-600  rounded-lg mt-6">
+      <div className="banner-overlay ">
         <div className="container">
           <div className="banner-content">
             <div className="banner-left">

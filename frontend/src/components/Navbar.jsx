@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Search, Bell, ChevronDown, User, LogOut, Settings, Globe, Menu, X } from 'lucide-react'
 import './Navbar.css'
 
 const Navbar = () => {
@@ -9,8 +10,19 @@ const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [countries, setCountries] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+
+  // Handle scroll effect for navbar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const checkAuthStatus = () => {
     const accessToken = localStorage.getItem('accessToken')
@@ -110,6 +122,28 @@ const Navbar = () => {
     })
   }
 
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`)
+      setSearchQuery('')
+    }
+  }
+
+  const closeAllDropdowns = () => {
+    setIsCountriesDropdownOpen(false)
+    setIsProfileDropdownOpen(false)
+  }
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      closeAllDropdowns()
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
+
   const getCountryFlag = (code) => {
     // Convert country code to flag emoji
     const codePoints = code
@@ -128,56 +162,105 @@ const Navbar = () => {
   return (
     <>
       {/* Top Navbar - Logo and Auth */}
-      <div className="top-navbar">
-        <div className="container">
+      <div className={`top-navbar ${isScrolled ? 'scrolled' : ''}`}>
+        <div className="container mx-auto">
           <div className="top-nav-content">
-            {/* <div className="nav-logo"> */}
-              <Link to="/">
-                <img src='/logo.png' alt="VisaGlobal" style={{width:'50px', objectFit: 'cover'}}/>
+            <div className="">
+              <Link  className="flex items-center gap-3" to="/">
+                <img className='rounded-full object-cover w-12' src='/logo.png' alt="VisaGlobal" />
+                <span className="logo-text">VisaGlobal</span>
               </Link>
-            {/* </div> */}
+            </div>
 
+            {/* Search Bar - Desktop */}
+            <div className="search-bar desktop-only">
+              <form onSubmit={handleSearch}>
+                <div className="search-input-container">
+                  <Search className="search-icon" size={18} />
+                  <input
+                    type="text"
+                    placeholder="     Search countries, visa types..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                  />
+                </div>
+              </form>
+            </div>
             
             <div className="auth-section">
               {isAuthenticated ? (
-                <div className="profile-dropdown">
-                  <button 
-                    className="profile-button"
-                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                  >
-                    <div className="profile-avatar">
-                      {user?.first_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
-                    </div>
-                    <span className="profile-name">{user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.username}</span>
-                    <span className="dropdown-arrow">▼</span>
+                <div className="auth-controls">
+                  {/* Notifications */}
+                  <button className="notification-btn" title="Notifications">
+                    <Bell size={20} />
+                    <span className="notification-badge">0</span>
                   </button>
-                  {isProfileDropdownOpen && (
-                    <div className="profile-dropdown-menu">
-                      <Link 
-                        to="/account" 
-                        className="dropdown-item"
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                      >
-                        My Profile
-                      </Link>
-                      <Link 
-                        to="/account" 
-                        className="dropdown-item"
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                      >
-                        My Applications
-                      </Link>
-                      <button 
-                        className="dropdown-item logout-btn"
-                        onClick={handleLogout}
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
+
+                  {/* Profile Dropdown */}
+                  <div className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
+                    <button 
+                      className="profile-button"
+                      onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    >
+                      <div className="profile-avatar">
+                        <User size={18} />
+                      </div>
+                      <span className="profile-name">{user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.username}</span>
+                      <ChevronDown className={`dropdown-arrow ${isProfileDropdownOpen ? 'open' : ''}`} size={16} />
+                    </button>
+                    {isProfileDropdownOpen && (
+                      <div className="profile-dropdown-menu">
+                        <div className="dropdown-header">
+                          <div className="user-info">
+                            <div className="user-avatar">
+                              {user?.first_name?.charAt(0) || user?.username?.charAt(0) || 'U'}
+                            </div>
+                            <div className="user-details">
+                              <div className="user-name">{user?.first_name && user?.last_name ? `${user.first_name} ${user.last_name}` : user?.username}</div>
+                              <div className="user-email">{user?.email}</div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="dropdown-divider"></div>
+                        <Link 
+                          to="/account" 
+                          className="dropdown-item"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <User size={16} />
+                          My Profile
+                        </Link>
+                        <Link 
+                          to="/account" 
+                          className="dropdown-item"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <Globe size={16} />
+                          My Applications
+                        </Link>
+                        {/* <Link 
+                          to="/account" 
+                          className="dropdown-item"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                        >
+                          <Settings size={16} />
+                          Settings
+                        </Link> */}
+                        <div className="dropdown-divider"></div>
+                        <button 
+                          className="dropdown-item logout-btn"
+                          onClick={handleLogout}
+                        >
+                          <LogOut size={16} />
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <>
+                <div className="auth-links">
                   <Link to="/login" className="auth-link login">
                     LOG IN
                   </Link>
@@ -185,28 +268,43 @@ const Navbar = () => {
                   <Link to="/signup" className="auth-link signup">
                     SIGN UP
                   </Link>
-                </>
+                </div>
               )}
             </div>
             
             {/* Mobile toggle button */}
-            <div 
+            <button 
               className={`nav-toggle ${isMobileMenuOpen ? 'active' : ''}`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
             >
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
       </div>
 
       {/* Main Navigation */}
-      <nav className="main-navbar">
-        <div className="container">
-          <div className="main-nav-content">
+      <nav className="main-navbar  ">
+        <div className="container mx-auto ">
+          <div className="main-nav-content ">
             <div className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+              {/* Mobile Search */}
+              <div className="mobile-search mobile-only">
+                <form onSubmit={handleSearch}>
+                  <div className="search-input-container">
+                    <Search className="search-icon" size={18} />
+                    <input
+                      type="text"
+                      placeholder="Search countries, visa types..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="search-input "
+                    />
+                  </div>
+                </form>
+              </div>
+
               <Link 
                 to="/" 
                 className={`nav-link ${isActive('/') ? 'active' : ''}`}
@@ -223,25 +321,32 @@ const Navbar = () => {
                 ABOUT US
               </Link>
               
-              <div className="countries-dropdown">
+              <div className="countries-dropdown" onClick={(e) => e.stopPropagation()}>
                 <button 
                   className={`dropdown-toggle ${isCountriesDropdownOpen ? 'open' : ''}`}
                   onClick={() => setIsCountriesDropdownOpen(!isCountriesDropdownOpen)}
                 >
+                  <Globe size={16} />
                   COUNTRIES
-                  <span className="dropdown-arrow">▼</span>
+                  <ChevronDown className={`dropdown-arrow ${isCountriesDropdownOpen ? 'open' : ''}`} size={16} />
                 </button>
                 <div className={`dropdown-menu ${isCountriesDropdownOpen ? 'open' : ''}`}>
-                  {countries.map((country) => (
-                    <button
-                      key={country.id}
-                      className="dropdown-item"
-                      onClick={() => handleCountrySelect(country)}
-                    >
-                      <span className="country-flag">{getCountryFlag(country.code)}</span>
-                      {country.name}
-                    </button>
-                  ))}
+                  <div className="dropdown-header">
+                    <span className="dropdown-title">Select Destination</span>
+                  </div>
+                  <div className="countries-grid">
+                    {countries.map((country) => (
+                      <button
+                        key={country.id}
+                        className="dropdown-item country-item"
+                        onClick={() => handleCountrySelect(country)}
+                      >
+                        <span className="country-flag">{getCountryFlag(country.code)}</span>
+                        <span className="country-name">{country.name}</span>
+                        <span className="country-visa-count">{country.visa_types?.length || 0} visas</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
               
@@ -270,10 +375,33 @@ const Navbar = () => {
                   MY ACCOUNT
                 </Link>
               )}
+
+              {/* Mobile Auth Links */}
+              {!isAuthenticated && (
+                <div className="mobile-auth mobile-only">
+                  <Link 
+                    to="/login" 
+                    className="mobile-auth-link login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    LOG IN
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    className="mobile-auth-link signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    SIGN UP
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>}
     </>
   )
 }

@@ -129,10 +129,10 @@ const CountryCards = () => {
                     <Users className="w-3 h-3" />
                     <span>500+ applied</span>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  {/* <div className="flex items-center space-x-1">
                     <MapPin className="w-3 h-3" />
                     <span>Multiple entry</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
