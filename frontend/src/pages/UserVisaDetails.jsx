@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './css/UserVisaDetails.css'
 
@@ -11,9 +11,9 @@ const UserVisaDetails = () => {
 
   useEffect(() => {
     fetchApplicationDetails()
-  }, [applicationId])
+  }, [applicationId, fetchApplicationDetails])
 
-  const fetchApplicationDetails = async () => {
+  const fetchApplicationDetails = useCallback(async () => {
     try {
       setLoading(true)
       const accessToken = localStorage.getItem('accessToken')
@@ -44,12 +44,12 @@ const UserVisaDetails = () => {
       } else {
         setError('Failed to fetch application details')
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.')
     } finally {
       setLoading(false)
     }
-  }
+  }, [applicationId])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -102,10 +102,10 @@ const UserVisaDetails = () => {
 
   if (loading) {
     return (
-      <div className="visa-details-page">
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Loading application details...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-sm sm:text-base text-gray-600">Loading application details...</p>
         </div>
       </div>
     )
@@ -113,10 +113,15 @@ const UserVisaDetails = () => {
 
   if (error) {
     return (
-      <div className="visa-details-page">
-        <div className="error-container">
-          <p className="error-message">{error}</p>
-          <button onClick={fetchApplicationDetails} className="retry-button">Try Again</button>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
+          <p className="text-red-600 font-medium mb-4 text-sm sm:text-base">{error}</p>
+          <button 
+            onClick={fetchApplicationDetails} 
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium transition-colors duration-300 text-sm sm:text-base"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     )
@@ -124,171 +129,182 @@ const UserVisaDetails = () => {
 
   if (!application) {
     return (
-      <div className="visa-details-page">
-        <div className="error-container">
-          <p className="error-message">Application not found.</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
+          <p className="text-gray-600 font-medium text-sm sm:text-base">Application not found.</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="visa-details-page">
-      <div className="details-header">
-        <div className="container">
-          <button className="back-button" onClick={() => navigate('/account')}>
-            ← Back to Account
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <button 
+            className="mb-4 sm:mb-6 flex items-center space-x-2 text-blue-100 hover:text-white transition-colors duration-300 text-sm sm:text-base" 
+            onClick={() => navigate('/account')}
+          >
+            <span>←</span>
+            <span>Back to Account</span>
           </button>
-          <div className="header-content">
-            <div className="application-info">
-              <div className="country-info">
-                <div className="country-image">
-                  <img 
-                    src={`http://127.0.0.1:8000${application.country.image}`} 
-                    alt={application.country.name}
-                    onError={(e) => {
-                      e.target.style.display = 'none'
-                      e.target.nextSibling.style.display = 'block'
-                    }}
-                  />
-                  <span className="country-flag" style={{ display: 'none' }}>
-                    {application.country.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div>
-                  <h1>{application.country.name} - {application.visa_type.name}</h1>
-                  <p>Application #{application.id}</p>
-                </div>
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-white/20 flex items-center justify-center">
+                <img 
+                  src={`http://127.0.0.1:8000${application.country.image}`} 
+                  alt={application.country.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none'
+                    e.target.nextSibling.style.display = 'block'
+                  }}
+                />
+                <span className="text-2xl sm:text-3xl" style={{ display: 'none' }}>
+                  {application.country.name.charAt(0).toUpperCase()}
+                </span>
               </div>
-              <div className="status-badge" style={{ backgroundColor: getStatusColor(application.status) }}>
-                <span className="status-icon">{getStatusIcon(application.status)}</span>
-                {getStatusText(application.status)}
+              <div>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-1">
+                  {application.country.name} - {application.visa_type.name}
+                </h1>
+                <p className="text-sm sm:text-base text-blue-100">Application #{application.id}</p>
               </div>
+            </div>
+            <div 
+              className="px-3 sm:px-4 py-2 sm:py-3 rounded-full text-white font-semibold flex items-center space-x-2 text-sm sm:text-base"
+              style={{ backgroundColor: getStatusColor(application.status) }}
+            >
+              <span>{getStatusIcon(application.status)}</span>
+              <span>{getStatusText(application.status)}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container">
-        <div className="details-content">
-          <div className="details-grid">
-            <div className="main-details">
-              <div className="detail-section">
-                <h2>Application Information</h2>
-                <div className="detail-cards">
-                  <div className="detail-card">
-                    <div className="detail-label">Application ID</div>
-                    <div className="detail-value">#{application.id}</div>
-                  </div>
-                  <div className="detail-card">
-                    <div className="detail-label">Application Date</div>
-                    <div className="detail-value">{formatDate(application.created_at)}</div>
-                  </div>
-                  <div className="detail-card">
-                    <div className="detail-label">Last Updated</div>
-                    <div className="detail-value">{formatDate(application.updated_at)}</div>
-                  </div>
-                  <div className="detail-card">
-                    <div className="detail-label">Status</div>
-                    <div className="detail-value status-value" style={{ color: getStatusColor(application.status) }}>
-                      {getStatusIcon(application.status)} {getStatusText(application.status)}
-                    </div>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6 lg:p-8">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Application Information</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
+                  <div className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Application ID</div>
+                  <div className="text-sm sm:text-base font-semibold text-gray-900">#{application.id}</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
+                  <div className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Application Date</div>
+                  <div className="text-sm sm:text-base font-semibold text-gray-900">{formatDate(application.created_at)}</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
+                  <div className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Last Updated</div>
+                  <div className="text-sm sm:text-base font-semibold text-gray-900">{formatDate(application.updated_at)}</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3 sm:p-4">
+                  <div className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Status</div>
+                  <div 
+                    className="text-sm sm:text-base font-semibold flex items-center space-x-2"
+                    style={{ color: getStatusColor(application.status) }}
+                  >
+                    <span>{getStatusIcon(application.status)}</span>
+                    <span>{getStatusText(application.status)}</span>
                   </div>
                 </div>
               </div>
-
-              {application.admin_notes && (
-                <div className="detail-section">
-                  <h2>Admin Notes</h2>
-                  <div className="notes-content">
-                    <p>{application.admin_notes}</p>
-                  </div>
-                </div>
-              )}
-
-              {application.rejection_reason && (
-                <div className="detail-section">
-                  <h2>Rejection Reason</h2>
-                  <div className="rejection-content">
-                    <p>{application.rejection_reason}</p>
-                  </div>
-                </div>
-              )}
-
-              {application.visa_type.required_documents && application.visa_type.required_documents.length > 0 && (
-                <div className="detail-section">
-                  <h2>Uploaded Documents</h2>
-                  <div className="documents-grid">
-                    {application.visa_type.required_documents.map((doc) => (
-                      <div key={doc.id} className="document-card">
-                        <div className="document-header">
-                          <span className="document-name">{doc.document_name}</span>
-                          <span 
-                            className="document-status"
-                            style={{ backgroundColor: getDocumentStatusColor(doc.status) }}
-                          >
-                            {doc.status}
-                          </span>
-                        </div>
-                        {doc.document_file && (
-                          <a 
-                            href={`http://127.0.0.1:8000${doc.document_file}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="document-link"
-                          >
-                            View Document
-                          </a>
-                        )}
-                        {doc.rejection_reason && (
-                          <div className="document-rejection">
-                            <span className="rejection-label">Rejection:</span>
-                            <span className="rejection-reason">{doc.rejection_reason}</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
-            <div className="sidebar">
-              <div className="visa-info-card">
-                <h3>Visa Information</h3>
-                <div className="visa-details">
-                  <div className="visa-detail-item">
-                    <span className="label">Country</span>
-                    <span className="value">{application.country.name}</span>
-                  </div>
-                  <div className="visa-detail-item">
-                    <span className="label">Visa Type</span>
-                    <span className="value">{application.visa_type.name}</span>
-                  </div>
-                  <div className="visa-detail-item">
-                    <span className="label">Required Documents</span>
-                    <span className="value">{application.visa_type.required_documents?.length || 0}</span>
-                  </div>
+            {application.admin_notes && (
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6 lg:p-8">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4">Admin Notes</h2>
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <p className="text-sm sm:text-base text-gray-700">{application.admin_notes}</p>
                 </div>
               </div>
+            )}
 
-              <div className="actions-card">
-                <h3>Actions</h3>
-                <div className="action-buttons">
-                  {application.status === 'draft' && (
-                    <button className="action-button primary">
-                      Complete Application
-                    </button>
-                  )}
-                  {application.status === 'rejected' && (
-                    <button className="action-button secondary">
-                      Reapply
-                    </button>
-                  )}
-                  <button className="action-button outline">
-                    Download Receipt
-                  </button>
+            {application.rejection_reason && (
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6 lg:p-8">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4">Rejection Reason</h2>
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p className="text-sm sm:text-base text-red-700">{application.rejection_reason}</p>
                 </div>
+              </div>
+            )}
+
+            {application.visa_type.required_documents && application.visa_type.required_documents.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6 lg:p-8">
+                <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Uploaded Documents</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  {application.visa_type.required_documents.map((doc) => (
+                    <div key={doc.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-shadow duration-300">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-semibold text-gray-900 text-sm sm:text-base">{doc.document_name}</span>
+                        <span 
+                          className="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium text-white"
+                          style={{ backgroundColor: getDocumentStatusColor(doc.status) }}
+                        >
+                          {doc.status}
+                        </span>
+                      </div>
+                      {doc.document_file && (
+                        <a 
+                          href={`http://127.0.0.1:8000${doc.document_file}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"
+                        >
+                          View Document
+                        </a>
+                      )}
+                      {doc.rejection_reason && (
+                        <div className="mt-3 p-3 bg-red-50 rounded-lg">
+                          <span className="text-xs sm:text-sm font-medium text-red-700">Rejection: </span>
+                          <span className="text-xs sm:text-sm text-red-600">{doc.rejection_reason}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Visa Information</h3>
+              <div className="space-y-4">
+                <div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-500">Country</span>
+                  <div className="text-sm sm:text-base font-semibold text-gray-900">{application.country.name}</div>
+                </div>
+                <div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-500">Visa Type</span>
+                  <div className="text-sm sm:text-base font-semibold text-gray-900">{application.visa_type.name}</div>
+                </div>
+                <div>
+                  <span className="text-xs sm:text-sm font-medium text-gray-500">Required Documents</span>
+                  <div className="text-sm sm:text-base font-semibold text-gray-900">{application.visa_type.required_documents?.length || 0}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Actions</h3>
+              <div className="space-y-3">
+                {application.status === 'draft' && (
+                  <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-2.5 sm:py-3 rounded-xl font-medium transition-all duration-300 text-sm sm:text-base">
+                    Complete Application
+                  </button>
+                )}
+                {application.status === 'rejected' && (
+                  <button className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white py-2.5 sm:py-3 rounded-xl font-medium transition-all duration-300 text-sm sm:text-base">
+                    Reapply
+                  </button>
+                )}
+                <button className="w-full bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 py-2.5 sm:py-3 rounded-xl font-medium transition-all duration-300 text-sm sm:text-base">
+                  Download Receipt
+                </button>
               </div>
             </div>
           </div>

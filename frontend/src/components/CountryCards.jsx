@@ -32,13 +32,18 @@ const CountryCards = () => {
     return String.fromCodePoint(...codePoints)
   }
 
+
+// console.log('Countries:', countries)
+
+  
+
   return (
-    <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
+    <section id="countries" className="py-16 bg-gradient-to-br from-gray-50 to-primary-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-primary-800 mb-4">
-            Popular Destinations
+            Your Destinations
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Explore visa services for the world's most sought-after destinations. 
@@ -80,7 +85,7 @@ const CountryCards = () => {
                 {index < 3 && (
                   <div className="absolute top-4 right-4 bg-primary-600 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
                     <Star className="w-3 h-3 fill-current" />
-                    <span>Popular</span>
+                    {/* <span>Popular</span> */}
                   </div>
                 )}
               </div>
@@ -119,12 +124,22 @@ const CountryCards = () => {
                   </div>
                 )}
 
+
+
+
+
+
+
                 {/* Quick Stats */}
                 <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-100">
-                  <div className="flex items-center space-x-1">
+
+                  {/* <div className="flex items-center space-x-1">
                     <Clock className="w-3 h-3" />
                     <span>5-10 days</span>
-                  </div>
+                  </div> */}
+
+
+
                   <div className="flex items-center space-x-1">
                     <Users className="w-3 h-3" />
                     <span>500+ applied</span>
@@ -142,13 +157,17 @@ const CountryCards = () => {
           ))}
         </div>
 
+
+
+
+
         {/* Load More Button */}
         {countries.length > 0 && (
           <div className="text-center mt-12">
-            <button className="bg-primary-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors inline-flex items-center space-x-2">
+            {/* <button className="bg-primary-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors inline-flex items-center space-x-2">
               <span>View All Countries</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </button> */}
           </div>
         )}
       </div>

@@ -67,36 +67,36 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-blue-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 animate-slide-up">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 lg:p-8">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary-600 to-primary-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <LogIn className="w-8 h-8 text-white" />
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+              <LogIn className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-3xl font-bold text-gray-900 mb-2">
               Welcome Back
             </h1>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600 px-2">
               Sign in to your account to continue your visa journey
             </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Success Message */}
             {success && (
-              <div className="flex items-center space-x-2 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm sm:text-base">
+                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
                 <span>{success}</span>
               </div>
             )}
 
             {/* Error Message */}
             {error && (
-              <div className="flex items-center space-x-2 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
-                <AlertCircle className="w-5 h-5 text-red-600" />
+              <div className="flex items-center space-x-2 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm sm:text-base">
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0" />
                 <span>{error}</span>
               </div>
             )}
@@ -122,13 +122,13 @@ const Login = () => {
               required
             />
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
               <div className="flex items-center">
                 <input
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Remember me
@@ -138,7 +138,7 @@ const Login = () => {
               <div className="text-sm">
                 <Link
                   to="/forgot-password"
-                  className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
+                  className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
                 >
                   Forgot your password?
                 </Link>
@@ -151,19 +151,19 @@ const Login = () => {
               size="lg"
               isLoading={loading}
               icon={LogIn}
-              className="w-full"
+              className="w-full justify-center"
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
 
           {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600">
+          <div className="mt-6 sm:mt-8 text-center">
+            <p className="text-sm sm:text-base text-gray-600">
               Don't have an account?{' '}
               <Link
                 to="/signup"
-                className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
+                className="font-medium text-blue-600 hover:text-blue-500 transition-colors"
               >
                 Sign up here
               </Link>
@@ -171,7 +171,7 @@ const Login = () => {
           </div>
 
           {/* Social Login Options */}
-          <div className="mt-8">
+          <div className="mt-6 sm:mt-8">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
@@ -181,16 +181,16 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-3">
               <button
                 type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center py-2.5 sm:py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
               >
                 <span>Google</span>
               </button>
               <button
                 type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+                className="w-full inline-flex justify-center py-2.5 sm:py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"
               >
                 <span>Facebook</span>
               </button>
@@ -199,14 +199,14 @@ const Login = () => {
         </div>
 
         {/* Additional Info */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-gray-600">
+        <div className="mt-6 sm:mt-8 text-center px-4">
+          <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
             By signing in, you agree to our{' '}
-            <Link to="/terms" className="text-primary-600 hover:text-primary-500">
+            <Link to="/terms" className="text-blue-600 hover:text-blue-500">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link to="/privacy" className="text-primary-600 hover:text-primary-500">
+            <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
               Privacy Policy
             </Link>
           </p>
