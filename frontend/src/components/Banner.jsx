@@ -1,9 +1,20 @@
 import './Banner.css'
 
 const Banner = () => {
+  const handleScrollToCountries = (e) => {
+    e.preventDefault()
+    const countriesSection = document.getElementById('countries')
+    if (countriesSection) {
+      countriesSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    }
+  }
+
   return (
-    <section className="banner">
-      <div className="banner-overlay">
+    <section className="banner w-[98vw] md:container mx-auto bg-red-600  rounded-lg mt-6">
+      <div className="banner-overlay ">
         <div className="container">
           <div className="banner-content">
             <div className="banner-left">
@@ -15,7 +26,7 @@ const Banner = () => {
               </p>
             </div>
             <div className="banner-right">
-              <a href="#countries" className="banner-button">Explore Visa Services</a>
+              <button onClick={handleScrollToCountries} className="banner-button">Explore Visa Services</button>
 
             </div>
           </div>

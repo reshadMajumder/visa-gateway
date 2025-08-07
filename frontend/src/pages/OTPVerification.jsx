@@ -127,75 +127,102 @@ const OTPVerification = () => {
   const isOtpComplete = otp.every(digit => digit !== '')
 
   return (
-    <div className="otp-page">
-      <div className="otp-container">
-        <div className="otp-header">
-          <div className="otp-icon">📧</div>
-          <h1 className="otp-title">Verify Your Email</h1>
-          <p className="otp-subtitle">
-            We've sent a 6-digit verification code to
-          </p>
-          <p className="otp-email">{email}</p>
-        </div>
-
-        {message && (
-          <div className={`${messageType}-message`}>
-            <span>{messageType === 'success' ? '✅' : '❌'}</span>
-            {message}
-          </div>
-        )}
-
-        <form className="otp-form" onSubmit={handleVerify}>
-          <div className="otp-input-group">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]"
-                maxLength="1"
-                className={`otp-input ${digit ? 'filled' : ''}`}
-                value={digit}
-                onChange={(e) => handleInputChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                onPaste={handlePaste}
-                autoComplete="off"
-              />
-            ))}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md mx-auto">
+        <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 lg:p-10">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="text-4xl sm:text-5xl lg:text-6xl mb-4 sm:mb-6">📧</div>
+            <h1 className="text-2xl sm:text-3xl lg:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
+              Verify Your Email
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600 mb-2">
+              We've sent a 6-digit verification code to
+            </p>
+            <p className="text-sm sm:text-base font-semibold text-blue-600 break-all px-2">
+              {email}
+            </p>
           </div>
 
-          <div className="otp-timer">
-            <span className="timer-icon">⏰</span>
-            <span className="timer-text">Code expires in:</span>
-            <span className="timer-countdown">{formatTime(timer)}</span>
+          {message && (
+            <div className={`flex items-center justify-center space-x-2 p-3 sm:p-4 mb-4 sm:mb-6 rounded-lg text-sm sm:text-base ${
+              messageType === 'success' 
+                ? 'bg-green-50 border border-green-200 text-green-800' 
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}>
+              <span className="text-lg">{messageType === 'success' ? '✅' : '❌'}</span>
+              <span className="text-center">{message}</span>
+            </div>
+          )}
+
+          <form className="space-y-6 sm:space-y-8" onSubmit={handleVerify}>
+            <div className="flex justify-center space-x-2 sm:space-x-3 lg:space-x-4">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]"
+                  maxLength="1"
+                  className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-center text-lg sm:text-xl lg:text-2xl font-bold border-2 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    digit 
+                      ? 'border-blue-500 bg-blue-50 text-blue-900' 
+                      : 'border-gray-300 bg-white text-gray-900 hover:border-gray-400'
+                  }`}
+                  value={digit}
+                  onChange={(e) => handleInputChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                  autoComplete="off"
+                />
+              ))}
+            </div>
+
+            <div className="flex items-center justify-center space-x-2 text-sm sm:text-base text-gray-600">
+              <span className="text-lg">⏰</span>
+              <span>Code expires in:</span>
+              <span className="font-bold text-blue-600">{formatTime(timer)}</span>
+            </div>
+
+            <button
+              type="submit"
+              className={`w-full py-3 sm:py-4 px-6 rounded-xl font-semibold text-sm sm:text-base lg:text-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                !isOtpComplete || isVerifying
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 hover:-translate-y-0.5 hover:shadow-lg'
+              }`}
+              disabled={!isOtpComplete || isVerifying}
+            >
+              {isVerifying ? 'Verifying...' : 'Verify Email'}
+            </button>
+          </form>
+
+          <div className="mt-6 sm:mt-8 text-center">
+            <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+              Didn't receive the code?
+            </p>
+            <button
+              className={`font-semibold text-sm sm:text-base transition-colors duration-300 ${
+                canResend
+                  ? 'text-blue-600 hover:text-blue-700 cursor-pointer'
+                  : 'text-gray-400 cursor-not-allowed'
+              }`}
+              onClick={handleResend}
+              disabled={!canResend}
+            >
+              {canResend ? 'Resend Code' : `Resend in ${formatTime(timer)}`}
+            </button>
           </div>
 
-          <button
-            type="submit"
-            className="verify-button"
-            disabled={!isOtpComplete || isVerifying}
-          >
-            {isVerifying ? 'Verifying...' : 'Verify Email'}
-          </button>
-        </form>
-
-        <div className="resend-section">
-          <p className="resend-text">Didn't receive the code?</p>
-          <button
-            className="resend-button"
-            onClick={handleResend}
-            disabled={!canResend}
-          >
-            {canResend ? 'Resend Code' : `Resend in ${formatTime(timer)}`}
-          </button>
-        </div>
-
-        <div className="back-to-login">
-          <Link to="/login">
-            <span>←</span>
-            Back to Login
-          </Link>
+          <div className="mt-6 sm:mt-8 text-center">
+            <Link 
+              to="/login"
+              className="inline-flex items-center space-x-2 text-sm sm:text-base text-gray-600 hover:text-blue-600 transition-colors duration-300"
+            >
+              <span className="text-lg">←</span>
+              <span>Back to Login</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
