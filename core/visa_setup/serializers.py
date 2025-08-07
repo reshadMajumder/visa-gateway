@@ -338,3 +338,5 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
                     continue
 
         return application
+
+
