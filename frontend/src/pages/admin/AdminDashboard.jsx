@@ -655,11 +655,11 @@ const AdminDashboard = () => {
             <div className="form-row">
               <div className="form-group">
                 <label>Company Name</label>
-                <input type="text" defaultValue="VisaGlobal" />
+                <input type="text" defaultValue="Schengen" />
               </div>
               <div className="form-group">
                 <label>Contact Email</label>
-                <input type="email" defaultValue="info@visaglobal.com" />
+                <input type="email" defaultValue="info@Schengen.com" />
               </div>
             </div>
             <div className="form-row">
@@ -759,7 +759,7 @@ const AdminDashboard = () => {
         <div className="admin-header-content">
           <div className="admin-logo">
             <div className="admin-logo-icon">⚡</div>
-            <h1 className="admin-logo-text">VisaGlobal Admin</h1>
+            <h1 className="admin-logo-text">Schengen Admin</h1>
           </div>
           
           <div className="admin-user-info">

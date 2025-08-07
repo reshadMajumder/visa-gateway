@@ -13,16 +13,17 @@ import Gallery from './pages/Gallery'
 import Contact from './pages/Contact'
 import UserAccount from './pages/UserAccount'
 import AdminDashboard from './pages/admin/AdminDashboard'
+import AllDestinations from './pages/AllDestinations'
 import Footer from './components/Footer'
-import './App.css'
 
 function App() {
   return (
-    <div className="App">
+    <div className="min-h-screen w-full flex flex-col">
       <Navbar />
-      <main>
+      <main className="flex-1 w-full">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/all-destinations" element={<AllDestinations />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/otp-verification" element={<OTPVerification />} />

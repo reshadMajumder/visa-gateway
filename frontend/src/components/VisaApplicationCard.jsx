@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_ENDPOINTS, buildMediaUrl } from '../config/api.js'
 import './VisaApplicationCard.css'
 
 const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) => {
@@ -107,7 +108,7 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
         }
       })
 
-      const response = await fetch(`http://127.0.0.1:8000/api/v2/visa-applications/${application.id}/`, {
+      const response = await fetch(`${API_ENDPOINTS.VISA_APPLICATIONS}/${application.id}/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -158,7 +159,7 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
         <div className="country-info">
           <div className="country-image">
             <img 
-              src={`http://127.0.0.1:8000${application.country.image}`} 
+              src={buildMediaUrl(application.country.image)} 
               alt={application.country.name}
               onError={(e) => {
                 e.target.style.display = 'none'
