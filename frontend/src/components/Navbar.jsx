@@ -253,7 +253,7 @@ const Navbar = () => {
       </div>
 
       {/* Desktop Main Navigation */}
-      <nav className="main-navbar hidden md:block">
+      <nav className=" hidden md:block">
         <div className="container mx-auto">
           <div className="main-nav-content">
             <div className="nav-menu">
