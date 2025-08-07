@@ -643,3 +643,4 @@ class UserVisaApplicationView(APIView):
             return Response({'error': f'Error deleting application: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
