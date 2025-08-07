@@ -40,13 +40,13 @@ class DetailedVisaTypeSerializer(serializers.ModelSerializer):
                  'processes', 'overviews', 'notes', 'required_documents',
                  'description','price','expected_processing_time', 'created_at', 'updated_at']
 
-    # def get_image(self, obj):
-    #     if obj.image:
-    #         request = self.context.get('request')
-    #         if request:
-    #             return request.build_absolute_uri(obj.image.url)
-    #         return obj.image.url
-    #     return None
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
 class VisaTypeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
@@ -56,13 +56,13 @@ class VisaTypeSerializer(serializers.ModelSerializer):
         model = VisaType
         fields = ['id', 'name', 'image','headings','price']
 
-    # def get_image(self, obj):
-    #     if obj.image:
-    #         request = self.context.get('request')
-    #         if request:
-    #             return request.build_absolute_uri(obj.image.url)
-    #         return obj.image.url
-    #     return None
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
 class CountrySerializer(serializers.ModelSerializer):
     types = VisaTypeSerializer(many=True)
@@ -73,14 +73,13 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'image',
                  'code', 'types', 'created_at', 'updated_at']
 
-    # def get_image(self, obj):
-    #     if obj.image:
-    #         request = self.context.get('request')
-    #         if request:
-    #             return request.build_absolute_uri(obj.image.url)
-    #         return obj.image.url
-    #     return None
-    
+    def get_image(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
 
 
 
