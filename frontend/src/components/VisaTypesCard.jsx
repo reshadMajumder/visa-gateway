@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { buildMediaUrl } from '../config/api.js'
 import './VisaTypesCard.css'
 
 const VisaTypesCard = ({ visa, country, index, isLoaded }) => {
@@ -27,7 +28,7 @@ const VisaTypesCard = ({ visa, country, index, isLoaded }) => {
     >
       <div className="visa-card-image">
         <img 
-          src={`http://127.0.0.1:8000${visa.image}`} 
+          src={buildMediaUrl(visa.image)} 
           alt={visa.name}
           onError={(e) => {
             e.target.style.display = 'none'

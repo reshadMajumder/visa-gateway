@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config/api.js';
 import './css/ApplyWithDocuments.css';
 
 const ApplyWithDocuments = () => {
@@ -14,7 +15,7 @@ const ApplyWithDocuments = () => {
 
   useEffect(() => {
     if (!visaTypeId) return;
-    fetch(`http://127.0.0.1:8000/api/visa-types/${visaTypeId}/`)
+    fetch(`${API_ENDPOINTS.VISA_TYPES}/${visaTypeId}/`)
       .then(res => res.json())
       .then(data => setRequiredDocs(data.required_documents || []))
       .catch(() => setError('Failed to fetch required documents.'));
@@ -83,7 +84,7 @@ const ApplyWithDocuments = () => {
     const token = localStorage.getItem('accessToken');
     
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v2/visa-applications/', {
+      const res = await fetch(API_ENDPOINTS.VISA_APPLICATIONS, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

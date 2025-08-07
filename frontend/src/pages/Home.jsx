@@ -159,7 +159,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-8 sm:py-12 lg:py-16 xl:py-20 bg-gradient-to-r from-primary-600 to-primary-800 text-white">
+      {/* <section className="py-8 sm:py-12 lg:py-16 xl:py-20 bg-gradient-to-r from-primary-600 to-primary-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 lg:mb-6 px-4">
             Ready to Start Your Visa Application?
@@ -176,7 +176,7 @@ const Home = () => {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, UserPlus, AlertCircle, CheckCircle } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
+import { API_ENDPOINTS } from '../config/api.js'
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -60,7 +61,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/accounts/register/', {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

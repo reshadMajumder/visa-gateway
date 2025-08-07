@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MapPin, Clock, Users, Star, ArrowRight } from 'lucide-react'
 import { cn } from '../lib/utils'
+import { API_ENDPOINTS } from '../config/api.js'
 
 const CountryCards = () => {
   const navigate = useNavigate()
@@ -9,7 +10,7 @@ const CountryCards = () => {
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/countries/')
+    fetch(API_ENDPOINTS.COUNTRIES)
       .then(res => res.json())
       .then(data => {
         setCountries(data)

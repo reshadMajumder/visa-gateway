@@ -73,7 +73,7 @@ const About = () => {
 
 
   return (
-    <div className="container mx-auto min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 rounded-xl">
+    <div className="w-[85vw] mx-auto min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 roundeda-xl">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12 sm:py-16 lg:py-20 xl:py-24 mt-4 sm:mt-6 rounded-xl mx-2 sm:mx-0">
         <div className="absolute inset-0 bg-black opacity-10 rounded-xl"></div>
@@ -246,7 +246,7 @@ const About = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-8 sm:py-12 lg:py-16 xl:py-20 bg-gradient-to-r from-primary-600 to-primary-800 text-white mx-2 sm:mx-0 rounded-xl">
+      {/* <section className="py-8 sm:py-12 lg:py-16 xl:py-20 bg-gradient-to-r from-primary-600 to-primary-800 text-white mx-2 sm:mx-0 rounded-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="animate-slide-up">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6 px-4">
@@ -268,7 +268,8 @@ const About = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
+      
     </div>
   )
 }

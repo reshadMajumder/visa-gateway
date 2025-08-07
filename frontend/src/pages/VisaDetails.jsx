@@ -1,6 +1,8 @@
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import ChildHero from '../components/ChildHero'
+import Swal from 'sweetalert2'
+import { API_ENDPOINTS } from '../config/api.js'
 import './css/VisaDetails.css'
 
 const VisaDetails = () => {
@@ -17,7 +19,7 @@ const VisaDetails = () => {
   }
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/visa-types/${visaId}/`)
+    fetch(`${API_ENDPOINTS.VISA_TYPES}/${visaId}/`)
       .then(response => response.json())
       .then(data => {
         console.log('Visa Details API Response:', data) // Debug log
@@ -71,6 +73,21 @@ const VisaDetails = () => {
   }
 
   const handleApplyNow = () => {
+    // Check if user is logged in by checking for access token
+    const token = localStorage.getItem('accessToken')
+    
+    if (!token) {
+      // Automatically redirect to login page for non-logged-in users
+      navigate('/login', { 
+        state: { 
+          from: `/country/${countryId}/visa/${visaId}`,
+          country: country 
+        } 
+      })
+      return
+    }
+    
+    // If user is logged in, show the apply modal
     setShowApplyModal(true)
   }
 
@@ -90,7 +107,7 @@ const VisaDetails = () => {
       formData.append('country_id', country.id);
       formData.append('visa_type_id', parseInt(visaId));
       
-      const response = await fetch('http://127.0.0.1:8000/api/v2/visa-applications/', {
+      const response = await fetch(API_ENDPOINTS.VISA_APPLICATIONS, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -122,7 +139,7 @@ const VisaDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 md:w-[85vw] w-[98vw] mx-auto">
       {/* Breadcrumbs */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
@@ -137,7 +154,7 @@ const VisaDetails = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-8 sm:py-12">
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-8 sm:py-12 rounded-lg mt-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <button 
             onClick={handleBack}

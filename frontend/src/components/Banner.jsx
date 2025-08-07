@@ -13,7 +13,7 @@ const Banner = () => {
   }
 
   return (
-    <section className="banner w-[98vw] md:container mx-auto bg-red-600  rounded-lg mt-6">
+    <section className="banner w-[98vw] md:w-[85vw] mx-auto bg-red-600  rounded-lg mt-6">
       <div className="banner-overlay ">
         <div className="container">
           <div className="banner-content">

@@ -91,10 +91,11 @@ const Gallery = () => {
     }
   }, [selectedCategory, galleryImages])
 
+  
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white md:w-[85vw] w-[98vw] mx-auto">
       {/* Enhanced Hero Section */}
-      <section className="bg-gradient-to-br from-blue-800 to-blue-900 text-white relative overflow-hidden">
+      <section className="bg-gradient-to-br from-blue-800 to-blue-900 text-white relative overflow-hidden rounded-xl mt-5">
         {/* Background pattern overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-800/20 to-transparent"></div>
         
@@ -212,8 +213,8 @@ const Gallery = () => {
       </section>
 
       {/* Call to Action Section */}
-      <section className="relative bg-gradient-to-br from-blue-900 to-blue-800 text-white overflow-hidden">
-        {/* Background decoration */}
+      {/* <section className="relative bg-gradient-to-br from-blue-900 to-blue-800 text-white overflow-hidden">
+       
         <div className="absolute inset-0 bg-gradient-to-r from-blue-800/20 to-transparent"></div>
         
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
@@ -233,7 +234,7 @@ const Gallery = () => {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   )
 }

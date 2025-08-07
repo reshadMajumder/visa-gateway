@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { API_ENDPOINTS } from '../config/api.js'
 import { 
   Mail, 
   Phone, 
@@ -20,7 +21,7 @@ const Footer = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/countries/')
+    fetch(API_ENDPOINTS.COUNTRIES)
       .then(response => response.json())
       .then(data => {
         setCountries(data.slice(0, 5)) // Get only first 5 countries

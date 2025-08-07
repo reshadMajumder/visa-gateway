@@ -1,6 +1,7 @@
 import { useParams, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import VisaTypesCard from '../components/VisaTypesCard'
+import { API_ENDPOINTS, buildMediaUrl, API_CONFIG } from '../config/api.js'
 import './css/CountryDetails.css'
 import './css/CountryDetailsEnhanced.css'
 import ChildHero from '../components/ChildHero'
@@ -18,7 +19,7 @@ const CountryDetails = () => {
     id: parseInt(countryId),
     name: 'Country',
     flag: '🌍',
-    image: 'http://127.0.0.1:8000/media/country_images/w1.jpg'
+    image: `${API_CONFIG.BASE_URL}/media/country_images/w1.jpg`
   })
   const [visaTypes, setVisaTypes] = useState([])
   const [isLoaded, setIsLoaded] = useState(false)
@@ -30,7 +31,7 @@ const CountryDetails = () => {
     setError(null)
     
     // Fetch visa types for the country - keeping original API call structure
-    fetch(`http://127.0.0.1:8000/api/country-visa-types/${countryId}/`)
+    fetch(`${API_ENDPOINTS.COUNTRY_VISA_TYPES}/${countryId}/`)
       .then(response => response.json())
       .then(data => {
         setVisaTypes(data)
@@ -44,7 +45,7 @@ const CountryDetails = () => {
       .finally(() => setLoading(false))
 
     // Fetch country details - keeping original API call structure
-    fetch(`http://127.0.0.1:8000/api/countries/${countryId}/`)
+    fetch(`${API_ENDPOINTS.COUNTRIES}/${countryId}/`)
       .then(response => response.json())
       .then(data => {
         setCountry(data)
@@ -61,7 +62,7 @@ const CountryDetails = () => {
       <div className="country-hero">
         <img src={country.image} alt={country.name} />
         <div className="hero-overlay">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="md:w-[85vw] w-[98vw]  mx-auto px-4 sm:px-6 lg:px-8">
             {/* Enhanced Title with Flag */}
             <div className="hero-content text-center">
               <div className="country-flag-large text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mb-4 sm:mb-6">{country.flag}</div>

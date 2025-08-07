@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { API_ENDPOINTS, buildMediaUrl } from '../config/api.js'
 import './css/UserVisaDetails.css'
 
 const UserVisaDetails = () => {
@@ -24,7 +25,7 @@ const UserVisaDetails = () => {
         return
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/api/v2/visa-applications/${applicationId}/`, {
+      const response = await fetch(`${API_ENDPOINTS.VISA_APPLICATIONS}/${applicationId}/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -153,7 +154,7 @@ const UserVisaDetails = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-white/20 flex items-center justify-center">
                 <img 
-                  src={`http://127.0.0.1:8000${application.country.image}`} 
+                  src={buildMediaUrl(application.country.image)} 
                   alt={application.country.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -249,7 +250,7 @@ const UserVisaDetails = () => {
                       </div>
                       {doc.document_file && (
                         <a 
-                          href={`http://127.0.0.1:8000${doc.document_file}`} 
+                          href={buildMediaUrl(doc.document_file)} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"

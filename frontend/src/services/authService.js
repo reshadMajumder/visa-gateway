@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://127.0.0.1:8000/api/accounts/';
+import { API_ENDPOINTS } from '../config/api.js';
 
 const setAuthToken = (tokens) => {
     if (tokens) {
@@ -16,7 +15,7 @@ const setAuthToken = (tokens) => {
 
 const register = async (userData) => {
     try {
-        const response = await axios.post(API_URL + 'register/', {
+        const response = await axios.post(API_ENDPOINTS.REGISTER, {
             email: userData.email,
             username: userData.email.split('@')[0], // Generate username from email
             password: userData.password,
@@ -33,7 +32,7 @@ const register = async (userData) => {
 
 const login = async (credentials) => {
     try {
-        const response = await axios.post(API_URL + 'login/', {
+        const response = await axios.post(API_ENDPOINTS.LOGIN, {
             email: credentials.email,
             password: credentials.password
         });
@@ -51,7 +50,7 @@ const logout = async () => {
     try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
-            await axios.post(API_URL + 'logout/', {
+            await axios.post(API_ENDPOINTS.LOGOUT, {
                 refresh_token: refreshToken
             });
         }
@@ -67,7 +66,7 @@ const refreshAccessToken = async () => {
         const refreshToken = localStorage.getItem('refreshToken');
         if (!refreshToken) throw new Error('No refresh token available');
 
-        const response = await axios.post(API_URL + 'login/refresh/', {
+        const response = await axios.post(API_ENDPOINTS.REFRESH_TOKEN, {
             refresh: refreshToken
         });
 
