@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { buildMediaUrl } from '../config/api.js'
 import './ChildHero.css'
 
 const ChildHero = ({ 
@@ -27,7 +28,7 @@ const ChildHero = ({
     <div className={`child-hero ${customClass}`}>
       {backgroundImage && (
         <div className="hero-background">
-          <img src={`http://127.0.0.1:8000/media/${backgroundImage}`} alt="Hero background" />
+          <img src={buildMediaUrl(`/media/${backgroundImage}`)} alt="Hero background" />
           <div className="hero-overlay"></div>
         </div>
       )}

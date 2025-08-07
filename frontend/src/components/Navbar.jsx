@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Search, Bell, ChevronDown, User, LogOut, Settings, Globe, Menu, X } from 'lucide-react'
+import { API_ENDPOINTS } from '../config/api.js'
 import './Navbar.css'
 
 const Navbar = () => {
@@ -58,7 +59,7 @@ const Navbar = () => {
 
   useEffect(() => {
     // Fetch countries from API
-    fetch('http://127.0.0.1:8000/api/countries/')
+    fetch(API_ENDPOINTS.COUNTRIES)
       .then(response => response.json())
       .then(data => {
         setCountries(data)
@@ -95,7 +96,7 @@ const Navbar = () => {
     const refreshToken = localStorage.getItem('refreshToken')
     
     // Call logout API
-    fetch('http://127.0.0.1:8000/api/accounts/logout/', {
+    fetch(API_ENDPOINTS.LOGOUT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -169,7 +170,7 @@ const Navbar = () => {
     <>
       {/* Desktop Navbar */}
       <div className={`top-navbar ${isScrolled ? 'scrolled' : ''} hidden md:block`}>
-        <div className="container mx-auto">
+        <div className="md:w-[83vw] w-[98vw] mx-auto">
           <div className="top-nav-content">
             <div className="">
               <Link  className="flex items-center gap-3" to="/">

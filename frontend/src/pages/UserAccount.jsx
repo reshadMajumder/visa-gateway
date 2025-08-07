@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import VisaApplicationCard from '../components/VisaApplicationCard'
 import UserProfile from './UserProfile'
+import { API_ENDPOINTS, buildMediaUrl } from '../config/api.js'
 import { 
   User, 
   BarChart3, 
@@ -54,7 +55,7 @@ const UserAccount = () => {
         return
       }
 
-      const response = await fetch('http://127.0.0.1:8000/api/accounts/profile/', {
+      const response = await fetch(API_ENDPOINTS.PROFILE, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -107,7 +108,7 @@ const UserAccount = () => {
         return
       }
 
-      const response = await fetch('http://127.0.0.1:8000/api/v2/visa-applications/', {
+      const response = await fetch(API_ENDPOINTS.VISA_APPLICATIONS, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -143,7 +144,7 @@ const UserAccount = () => {
     if (!refreshTokenValue) return false
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/accounts/login/refresh/', {
+      const response = await fetch(API_ENDPOINTS.REFRESH_TOKEN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -202,7 +203,7 @@ const UserAccount = () => {
         }
       })
 
-      const response = await fetch('http://127.0.0.1:8000/api/accounts/profile/', {
+      const response = await fetch(API_ENDPOINTS.PROFILE, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -319,7 +320,7 @@ const UserAccount = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-blue-100 md:w-[85vw] w-[98vw] mx-auto rounded-lg my-5">
       {/* Header Section */}
       <div className="bg-white shadow-lg border-b border-gray-200">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -327,7 +328,7 @@ const UserAccount = () => {
             <div className="w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg overflow-hidden">
               {user.profile_picture ? (
                 <img 
-                  src={`http://127.0.0.1:8000${user.profile_picture}`} 
+                  src={buildMediaUrl(user.profile_picture)} 
                   alt="Profile" 
                   className="w-full h-full object-cover"
                 />

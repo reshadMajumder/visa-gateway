@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Clock, Users, Star, ArrowRight, Globe, Filter, MapPin } from 'lucide-react'
+import { API_ENDPOINTS } from '../config/api.js'
 
 const AllDestinations = () => {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ const AllDestinations = () => {
   const fetchCountries = useCallback(async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('http://127.0.0.1:8000/api/countries/')
+      const response = await fetch(API_ENDPOINTS.COUNTRIES)
       const data = await response.json()
       setCountries(data)
     } catch (error) {
@@ -113,10 +114,12 @@ const AllDestinations = () => {
     )
   }
 
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 md:w-[85vw] w-[98vw] mx-auto">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 text-white py-8 sm:py-12 lg:py-16 xl:py-20">
+      <div className=" rounded-xl mt-5  bg-gradient-to-r from-primary-900 via-primary-800 to-primary-900 text-white py-8 sm:py-12 lg:py-16 xl:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex flex-col sm:flex-row items-center justify-center mb-4 sm:mb-6">
@@ -242,7 +245,7 @@ const AllDestinations = () => {
       </div>
 
       {/* Call to Action Section */}
-      <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white py-8 sm:py-12 lg:py-16 xl:py-20">
+      {/* <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white py-8 sm:py-12 lg:py-16 xl:py-20">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 lg:mb-6">Need Help Choosing?</h2>
           <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-primary-100 mb-6 sm:mb-8 lg:mb-10 px-4">
@@ -256,7 +259,7 @@ const AllDestinations = () => {
             <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

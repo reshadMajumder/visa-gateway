@@ -72,9 +72,9 @@ const Contact = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 md:w-[85vw] w-[98vw] mx-auto">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-800 to-blue-900 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-blue-800 to-blue-900 text-white overflow-hidden rounded-xl mt-5">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-800/20 to-transparent"></div>
         
