@@ -32,7 +32,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=255)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    profile_picture = models.URLField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

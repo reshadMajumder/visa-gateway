@@ -111,22 +111,33 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return value
 
     def validate_profile_picture(self, value):
-        """
-        Validate profile picture
-        """
-        if value:
-            # Check file size (max 5MB)
+        """Allow either an uploaded file or a URL string for profile picture."""
+        if value is None:
+            return value
+
+        # If it's an UploadedFile-like object, enforce file validations
+        file_obj = getattr(value, 'file', None)
+        if hasattr(value, 'size') or file_obj is not None:
             if value.size > 5 * 1024 * 1024:
                 raise serializers.ValidationError("Profile picture size cannot exceed 5MB.")
-            
-            # Check file extension
             allowed_extensions = ['.jpg', '.jpeg', '.png']
             ext = '.' + value.name.split('.')[-1].lower()
             if ext not in allowed_extensions:
                 raise serializers.ValidationError(
                     f"Only {', '.join(allowed_extensions)} files are allowed for profile picture."
                 )
-        
+            return value
+
+        # Otherwise, accept string URL (comes from Supabase upload in the view)
+        if isinstance(value, str):
+            # Basic sanity check for URL-like values
+            if value.startswith('http://') or value.startswith('https://'):
+                return value
+            # Allow empty string to clear
+            if value == '':
+                return value
+            raise serializers.ValidationError("Invalid profile picture URL.")
+
         return value
 
     def validate(self, attrs):
@@ -176,6 +187,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error": f"Error creating user: {str(e)}"})
 
 class UserSerializer(serializers.ModelSerializer):
+    # Accept Supabase URL as string when updating
+    profile_picture = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+
     class Meta:
         model = User
         fields = ('id', 'email', 'username', 'first_name','last_name', 'phone_number',
