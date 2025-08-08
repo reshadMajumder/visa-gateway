@@ -3,6 +3,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
@@ -109,13 +110,43 @@ class UserProfileView(APIView):
     Supports retrieving and updating user profile information.
     """
     permission_classes = (IsAuthenticated,)
+    parser_classes = [MultiPartParser, FormParser]
     
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
     def put(self, request):
-        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        # If a new profile picture is provided, upload to Supabase and replace with URL
+        data = request.data.copy()
+        if 'profile_picture' in request.FILES:
+            try:
+                profile_file = request.FILES['profile_picture']
+
+                # Basic validation (max 5MB and allowed extensions)
+                if profile_file.size > 5 * 1024 * 1024:
+                    return Response({'error': 'Profile picture size cannot exceed 5MB.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                allowed_extensions = {'.jpg', '.jpeg', '.png'}
+                ext = '.' + profile_file.name.split('.')[-1].lower()
+                if ext not in allowed_extensions:
+                    return Response({'error': f"Only {', '.join(sorted(allowed_extensions))} files are allowed for profile picture."}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Upload to Supabase
+                from core.supabase_client import upload_file_to_supabase
+                public_url = upload_file_to_supabase(profile_file, folder="profiles", bucket="visa")
+
+                # Replace file with URL for saving
+                data['profile_picture'] = public_url
+            except Exception as e:
+                return Response({'error': f'Failed to upload profile picture: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If client mistakenly sent text for profile_picture in form-data, ignore non-file entry
+        elif isinstance(request.data.get('profile_picture'), str) and request.data.get('profile_picture') == '':
+            # Allow clearing the profile picture by sending empty string
+            data['profile_picture'] = ''
+
+        serializer = UserSerializer(request.user, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({

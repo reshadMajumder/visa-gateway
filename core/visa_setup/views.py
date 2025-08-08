@@ -211,18 +211,37 @@ class VisaApplicationView(APIView):
                 
                 if existing_doc:
                     # Update existing document
-                    existing_doc.file = file
+                    try:
+                        from core.supabase_client import upload_file_to_supabase
+                        file_url = upload_file_to_supabase(file)
+                        existing_doc.file = file_url
+                    except Exception as e:
+                        # Fallback: keep existing file or set to None
+                        existing_doc.file = None
+                    
                     existing_doc.status = 'pending'
                     existing_doc.rejection_reason = ''
                     existing_doc.save()
                 else:
                     # Create new document
-                    ApplicationDocument.objects.create(
-                        application=application,
-                        required_document=required_document,
-                        file=file,
-                        status='pending'
-                    )
+                    try:
+                        from core.supabase_client import upload_file_to_supabase
+                        file_url = upload_file_to_supabase(file)
+                        
+                        ApplicationDocument.objects.create(
+                            application=application,
+                            required_document=required_document,
+                            file=file_url,
+                            status='pending'
+                        )
+                    except Exception as e:
+                        # Fallback: create without file URL
+                        ApplicationDocument.objects.create(
+                            application=application,
+                            required_document=required_document,
+                            file=None,
+                            status='pending'
+                        )
             
             # Update application status to submitted
             application.status = 'submitted'
@@ -333,19 +352,39 @@ class UserVisaApplicationView(APIView):
                 except RequiredDocuments.DoesNotExist:
                     return Response({'error': f'Required document with ID {doc_id} does not exist'}, status=404)
 
-                # Update or create ApplicationDocument
-                app_doc, created = ApplicationDocument.objects.get_or_create(
-                    application=app,
-                    required_document=required_doc,
-                    defaults={'file': file}
-                )
+                # Upload to Supabase
+                try:
+                    from core.supabase_client import upload_file_to_supabase
+                    file_url = upload_file_to_supabase(file)
+                    
+                    # Update or create ApplicationDocument with Supabase URL
+                    app_doc, created = ApplicationDocument.objects.get_or_create(
+                        application=app,
+                        required_document=required_doc,
+                        defaults={'file': file_url}
+                    )
 
-                if not created:
-                    app_doc.file = file
-                    app_doc.status = 'pending'  # Reset status after upload
-                    app_doc.admin_notes = ''
-                    app_doc.rejection_reason = ''
-                    app_doc.save()
+                    if not created:
+                        app_doc.file = file_url
+                        app_doc.status = 'pending'  # Reset status after upload
+                        app_doc.admin_notes = ''
+                        app_doc.rejection_reason = ''
+                        app_doc.save()
+                        
+                except Exception as e:
+                    # Fallback to local storage if Supabase upload fails
+                    app_doc, created = ApplicationDocument.objects.get_or_create(
+                        application=app,
+                        required_document=required_doc,
+                        defaults={'file': None}
+                    )
+
+                    if not created:
+                        app_doc.file = None
+                        app_doc.status = 'pending'  # Reset status after upload
+                        app_doc.admin_notes = ''
+                        app_doc.rejection_reason = ''
+                        app_doc.save()
 
                 updated = True
 

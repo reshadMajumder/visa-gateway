@@ -197,6 +197,7 @@ class VisaOverviewDetailView(APIView):
 # --- RequiredDocuments Views ---
 class RequiredDocumentsView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         docs = RequiredDocuments.objects.all()
@@ -204,7 +205,29 @@ class RequiredDocumentsView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = RequiredDocumentsSerializer(data=request.data)
+        # Handle document file upload if provided
+        data = request.data.copy()
+        if 'document_file' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                document_file = request.FILES['document_file']
+                
+                # Validate file
+                if document_file.size > 1024 * 1024 * 10:  # 10MB limit for documents
+                    return Response({'error': 'File size cannot exceed 10MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.pdf', '.docx', '.doc', '.jpg', '.jpeg', '.png']
+                if not any(document_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'File type not allowed. Use PDF, DOCX, DOC, JPG, JPEG, or PNG'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                file_url = upload_file_to_supabase(document_file, folder="documents")
+                data['document_file'] = file_url
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload file: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = RequiredDocumentsSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -213,6 +236,7 @@ class RequiredDocumentsView(APIView):
 
 class RequiredDocumentsDetailView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, pk):
         doc = get_object_or_404_custom(RequiredDocuments, pk)
@@ -221,7 +245,30 @@ class RequiredDocumentsDetailView(APIView):
 
     def put(self, request, pk):
         doc = get_object_or_404_custom(RequiredDocuments, pk)
-        serializer = RequiredDocumentsSerializer(doc, data=request.data,partial=True)
+        
+        # Handle document file upload if provided
+        data = request.data.copy()
+        if 'document_file' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                document_file = request.FILES['document_file']
+                
+                # Validate file
+                if document_file.size > 1024 * 1024 * 10:  # 10MB limit for documents
+                    return Response({'error': 'File size cannot exceed 10MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.pdf', '.docx', '.doc', '.jpg', '.jpeg', '.png']
+                if not any(document_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'File type not allowed. Use PDF, DOCX, DOC, JPG, JPEG, or PNG'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                file_url = upload_file_to_supabase(document_file, folder="documents")
+                data['document_file'] = file_url
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload file: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = RequiredDocumentsSerializer(doc, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -239,6 +286,7 @@ class RequiredDocumentsDetailView(APIView):
 
 class CountryListCreateView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         countries = Country.objects.all()
@@ -246,7 +294,29 @@ class CountryListCreateView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = CountrySerializer(data=request.data)
+        # Handle image upload if provided
+        data = request.data.copy()
+        if 'image' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                image_file = request.FILES['image']
+                
+                # Validate image file
+                if image_file.size > 1024 * 1024 * 5:  # 5MB limit for images
+                    return Response({'error': 'Image size cannot exceed 5MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                if not any(image_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'Image type not allowed. Use JPG, JPEG, PNG, or GIF'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                image_url = upload_file_to_supabase(image_file, folder="countries")
+                data['image'] = image_url
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload image: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = CountrySerializer(data=data)
         if serializer.is_valid():
             country = serializer.save()
             return Response(CountrySerializer(country).data, status=status.HTTP_201_CREATED)
@@ -255,6 +325,7 @@ class CountryListCreateView(APIView):
 
 class CountryDetailView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, pk):
         country = get_object_or_404(Country, pk=pk)
@@ -262,7 +333,30 @@ class CountryDetailView(APIView):
 
     def put(self, request, pk):
         country = get_object_or_404(Country, pk=pk)
-        serializer = CountrySerializer(country, data=request.data, partial=True)
+        
+        # Handle image upload if provided
+        data = request.data.copy()
+        if 'image' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                image_file = request.FILES['image']
+                
+                # Validate image file
+                if image_file.size > 1024 * 1024 * 5:  # 5MB limit for images
+                    return Response({'error': 'Image size cannot exceed 5MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                if not any(image_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'Image type not allowed. Use JPG, JPEG, PNG, or GIF'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                image_url = upload_file_to_supabase(image_file, folder="countries")
+                data['image'] = image_url
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload image: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = CountrySerializer(country, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(CountrySerializer(country).data)
@@ -278,6 +372,7 @@ class CountryDetailView(APIView):
 
 class VisaTypeListCreateView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         visatypes = VisaType.objects.all()
@@ -285,7 +380,29 @@ class VisaTypeListCreateView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = VisaTypeSerializer(data=request.data)
+        # Handle image upload if provided
+        data = request.data.copy()
+        if 'image' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                image_file = request.FILES['image']
+                
+                # Validate image file
+                if image_file.size > 1024 * 1024 * 5:  # 5MB limit for images
+                    return Response({'error': 'Image size cannot exceed 5MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                if not any(image_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'Image type not allowed. Use JPG, JPEG, PNG, or GIF'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                image_url = upload_file_to_supabase(image_file, folder="visa_types")
+                data['image'] = image_url
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload image: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = VisaTypeSerializer(data=data)
         if serializer.is_valid():
             visa_type = serializer.save()
             return Response(VisaTypeSerializer(visa_type).data, status=status.HTTP_201_CREATED)
@@ -294,6 +411,7 @@ class VisaTypeListCreateView(APIView):
 
 class VisaTypeDetailView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, pk):
         visa_type = get_object_or_404(VisaType, pk=pk)
@@ -301,7 +419,30 @@ class VisaTypeDetailView(APIView):
 
     def put(self, request, pk):
         visa_type = get_object_or_404(VisaType, pk=pk)
-        serializer = VisaTypeSerializer(visa_type, data=request.data, partial=True)
+        
+        # Handle image upload if provided
+        data = request.data.copy()
+        if 'image' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                image_file = request.FILES['image']
+                
+                # Validate image file
+                if image_file.size > 1024 * 1024 * 5:  # 5MB limit for images
+                    return Response({'error': 'Image size cannot exceed 5MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                if not any(image_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'Image type not allowed. Use JPG, JPEG, PNG, or GIF'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                image_url = upload_file_to_supabase(image_file, folder="visa_types")
+                data['image'] = image_url
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload image: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = VisaTypeSerializer(visa_type, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(VisaTypeSerializer(visa_type).data)
@@ -317,6 +458,7 @@ class VisaTypeDetailView(APIView):
 
 class CountryVisaTypesView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, country_id):
         """Get all visa types for a specific country"""
@@ -328,7 +470,30 @@ class CountryVisaTypesView(APIView):
     def post(self, request, country_id):
         """Create a new visa type and associate it with the country"""
         country = get_object_or_404(Country, pk=country_id)
-        serializer = CountryVisaTypeSerializer(data=request.data)
+        
+        # Handle image upload if provided
+        data = request.data.copy()
+        if 'image' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                image_file = request.FILES['image']
+                
+                # Validate image file
+                if image_file.size > 1024 * 1024 * 5:  # 5MB limit for images
+                    return Response({'error': 'Image size cannot exceed 5MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                if not any(image_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'Image type not allowed. Use JPG, JPEG, PNG, or GIF'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                image_url = upload_file_to_supabase(image_file, folder="visa_types")
+                data['image'] = image_url
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload image: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = CountryVisaTypeSerializer(data=data)
         if serializer.is_valid():
             visa_type = serializer.save()
             # Associate the visa type with the country
@@ -339,6 +504,7 @@ class CountryVisaTypesView(APIView):
 
 class CountryVisaTypeDetailView(APIView):
     permission_classes = [IsSuperUser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, country_id, visa_type_id):
         """Get a specific visa type for a country"""
@@ -359,6 +525,29 @@ class CountryVisaTypeDetailView(APIView):
         # Check if the visa type belongs to the country
         if visa_type not in country.types.all():
             return Response({"error": "Visa type not found for this country"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Handle image upload if provided
+        if 'image' in request.FILES:
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                image_file = request.FILES['image']
+                
+                # Validate image file
+                if image_file.size > 1024 * 1024 * 5:  # 5MB limit for images
+                    return Response({'error': 'Image size cannot exceed 5MB'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif']
+                if not any(image_file.name.lower().endswith(ext) for ext in allowed_extensions):
+                    return Response({'error': 'Image type not allowed. Use JPG, JPEG, PNG, or GIF'}, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Upload to Supabase
+                image_url = upload_file_to_supabase(image_file, folder="visa_types")
+                request.data._mutable = True
+                request.data['image'] = image_url
+                request.data._mutable = False
+                
+            except Exception as e:
+                return Response({'error': f'Failed to upload image: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = VisaTypeSerializer(visa_type, data=request.data, partial=True)
         if serializer.is_valid():
@@ -604,19 +793,39 @@ class UserVisaApplicationView(APIView):
                 except RequiredDocuments.DoesNotExist:
                     return Response({'error': f'Required document with ID {doc_id} does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-                # Update or create ApplicationDocument
-                app_doc, created = ApplicationDocument.objects.get_or_create(
-                    application=app,
-                    required_document=required_doc,
-                    defaults={'file': file}
-                )
+                # Upload to Supabase
+                try:
+                    from core.supabase_client import upload_file_to_supabase
+                    file_url = upload_file_to_supabase(file)
+                    
+                    # Update or create ApplicationDocument with Supabase URL
+                    app_doc, created = ApplicationDocument.objects.get_or_create(
+                        application=app,
+                        required_document=required_doc,
+                        defaults={'file': file_url}
+                    )
 
-                if not created:
-                    app_doc.file = file
-                    app_doc.status = 'pending'  # Reset status after upload
-                    app_doc.admin_notes = ''
-                    app_doc.rejection_reason = ''
-                    app_doc.save()
+                    if not created:
+                        app_doc.file = file_url
+                        app_doc.status = 'pending'  # Reset status after upload
+                        app_doc.admin_notes = ''
+                        app_doc.rejection_reason = ''
+                        app_doc.save()
+                        
+                except Exception as e:
+                    # Fallback to local storage if Supabase upload fails
+                    app_doc, created = ApplicationDocument.objects.get_or_create(
+                        application=app,
+                        required_document=required_doc,
+                        defaults={'file': None}
+                    )
+
+                    if not created:
+                        app_doc.file = None
+                        app_doc.status = 'pending'  # Reset status after upload
+                        app_doc.admin_notes = ''
+                        app_doc.rejection_reason = ''
+                        app_doc.save()
 
                 updated = True
 

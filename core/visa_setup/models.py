@@ -26,7 +26,7 @@ class VisaOverview(models.Model):
 class RequiredDocuments(models.Model):
     document_name = models.CharField(max_length=100)
     description = models.TextField(blank=True, help_text="Detailed description of the document requirements")
-    document_file=models.FileField(upload_to='visa_documents/%Y/%m/', null=True, blank=True ,validators =[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'])])
+    document_file=models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True,null=True, blank=True)
     def __str__(self):
@@ -38,7 +38,7 @@ class VisaType(models.Model):
     name = models.CharField(max_length=100)
     headings = models.TextField()
     active = models.BooleanField(default=True)
-    image = models.ImageField(upload_to='visa_type_images/', null=True, blank=True)
+    image = models.URLField(blank=True, null=True)
 
     # Changed to ManyToMany for flexibility
     processes = models.ManyToManyField(VisaProcess, related_name='visa_types', blank=True)
@@ -67,7 +67,7 @@ class Country(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     code= models.CharField(max_length=10, unique=True)
-    image = models.ImageField(upload_to='country_images/', null=True, blank=True)
+    image = models.URLField(blank=True, null=True)
 
     # One-to-many: one VisaType to many Countries
     types = models.ManyToManyField(VisaType, related_name='countries')
@@ -109,10 +109,7 @@ class VisaApplication(models.Model):
 class ApplicationDocument(models.Model):
     application = models.ForeignKey(VisaApplication, on_delete=models.CASCADE, related_name='documents')
     required_document = models.ForeignKey(RequiredDocuments, on_delete=models.CASCADE)
-    file = models.FileField(
-        upload_to='visa_documents/%Y/%m/',
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'])]
-    )
+    file = models.URLField(blank=True, null=True)
     status = models.CharField(max_length=20, default='pending', choices=[
         ('pending', 'Pending Review'),
         ('approved', 'Approved'),

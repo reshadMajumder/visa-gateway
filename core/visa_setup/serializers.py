@@ -41,28 +41,17 @@ class DetailedVisaTypeSerializer(serializers.ModelSerializer):
                  'description','price','expected_processing_time', 'created_at', 'updated_at']
 
     def get_image(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
+        return obj.image if obj.image else None
 
 class VisaTypeSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-
 
     class Meta:
         model = VisaType
         fields = ['id', 'name', 'image','headings','price']
 
     def get_image(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
+        return obj.image if obj.image else None
 
 class CountrySerializer(serializers.ModelSerializer):
     types = VisaTypeSerializer(many=True)
@@ -74,12 +63,7 @@ class CountrySerializer(serializers.ModelSerializer):
                  'code', 'types', 'created_at', 'updated_at']
 
     def get_image(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
+        return obj.image if obj.image else None
 
 
 
@@ -109,7 +93,7 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
         return {
             'id': obj.country.id,
             'name': obj.country.name,
-            'image': obj.country.image.url if obj.country.image else None
+            'image': obj.country.image if obj.country.image else None
         }
 
     def get_visa_type(self, obj):
@@ -124,7 +108,7 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
         return {
             'id': obj.visa_type.id,
             'name': obj.visa_type.name,
-            'image': obj.visa_type.image.url if obj.visa_type.image else None,
+            'image': obj.visa_type.image if obj.visa_type.image else None,
             'required_documents': required_documents
         }
 
@@ -144,7 +128,7 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
                 'id': doc.id,
                 'document_name': doc.required_document.document_name,
                 'status': doc.status,
-                'file': doc.file.url if doc.file else None,
+                'file': doc.file if doc.file else None,
                 'rejection_reason': doc.rejection_reason
             })
         return documents
@@ -232,12 +216,25 @@ class VisaApplicationSerializer(serializers.ModelSerializer):
             file = file_info['file']
             required_document = RequiredDocuments.objects.get(id=required_document_id)
             
-            ApplicationDocument.objects.create(
-                application=visa_application,
-                required_document=required_document,
-                file=file,
-                status='pending'
-            )
+            # Upload to Supabase
+            try:
+                from core.supabase_client import upload_file_to_supabase
+                file_url = upload_file_to_supabase(file)
+                
+                ApplicationDocument.objects.create(
+                    application=visa_application,
+                    required_document=required_document,
+                    file=file_url,
+                    status='pending'
+                )
+            except Exception as e:
+                # Fallback: create without file URL
+                ApplicationDocument.objects.create(
+                    application=visa_application,
+                    required_document=required_document,
+                    file=None,
+                    status='pending'
+                )
         
         return visa_application
 
@@ -266,7 +263,7 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
         return {
             'id': obj.country.id,
             'name': obj.country.name,
-            'image': obj.country.image.url if obj.country.image else None
+            'image': obj.country.image if obj.country.image else None
         }
 
     def get_visa_type(self, obj):
@@ -284,7 +281,7 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
                 'id': doc.id,
                 'document_name': doc.document_name,
                 'description': doc.description,
-                'document_file': uploaded.file.url if uploaded and uploaded.file else None,
+                'document_file': uploaded.file if uploaded and uploaded.file else None,
                 'status': uploaded.status if uploaded else 'not_uploaded',
                 'admin_notes': uploaded.admin_notes if uploaded else '',
             })
@@ -292,7 +289,7 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
         return {
             'id': obj.visa_type.id,
             'name': obj.visa_type.name,
-            'image': obj.visa_type.image.url if obj.visa_type.image else None,
+            'image': obj.visa_type.image if obj.visa_type.image else None,
             'required_documents': required_documents
         }
 
@@ -329,11 +326,27 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
                 doc_id = key.split("[")[1].split("]")[0]
                 try:
                     required_doc = RequiredDocuments.objects.get(id=doc_id)
-                    ApplicationDocument.objects.create(
-                        application=application,
-                        required_document=required_doc,
-                        file=file
-                    )
+                    
+                    # Upload to Supabase
+                    try:
+                        from core.supabase_client import upload_file_to_supabase
+                        file_url = upload_file_to_supabase(file)
+                        
+                        ApplicationDocument.objects.create(
+                            application=application,
+                            required_document=required_doc,
+                            file=file_url,
+                            status='pending'
+                        )
+                    except Exception as e:
+                        # Fallback: create without file URL
+                        ApplicationDocument.objects.create(
+                            application=application,
+                            required_document=required_doc,
+                            file=None,
+                            status='pending'
+                        )
+                        
                 except RequiredDocuments.DoesNotExist:
                     continue
 
