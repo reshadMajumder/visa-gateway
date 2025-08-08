@@ -1,6 +1,6 @@
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: 'https://spring.rexhad.co',
+  BASE_URL: 'http://127.0.0.1:8000',
   API_VERSION: 'api',
   ENDPOINTS: {
     AUTH: 'accounts',
@@ -18,14 +18,14 @@ export const buildApiUrl = (endpoint, path = '') => {
 export const API_ENDPOINTS = {
   // Auth endpoints
   AUTH_BASE: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH),
-  REGISTER: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'register'),
-  LOGIN: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'login'),
-  LOGOUT: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'logout'),
-  REFRESH_TOKEN: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'login/refresh'),
-  PROFILE: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'profile'),
+  REGISTER: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'register/'),
+  LOGIN: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'login/'),
+  LOGOUT: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'logout/'),
+  REFRESH_TOKEN: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'login/refresh/'),
+  PROFILE: buildApiUrl(API_CONFIG.ENDPOINTS.AUTH, 'profile/'),
   
   // Visa endpoints
-  VISA_APPLICATIONS: buildApiUrl(API_CONFIG.ENDPOINTS.VISA, 'visa-applications'),
+  VISA_APPLICATIONS: buildApiUrl(API_CONFIG.ENDPOINTS.VISA, 'visa-applications/'),
   
   // Other endpoints
   COUNTRIES: `${API_CONFIG.BASE_URL}/${API_CONFIG.API_VERSION}/countries`,
