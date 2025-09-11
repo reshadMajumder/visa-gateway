@@ -59,43 +59,22 @@ const CountryDetails = () => {
   return (
     <div className="country-details">
       {/* Enhanced Hero Section */}
-      <div className="country-hero">
-        <img src={country.image} alt={country.name} />
-        <div className="hero-overlay">
-          <div className="md:w-[85vw] w-[98vw]  mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Enhanced Title with Flag */}
-            <div className="hero-content text-center">
-              <div className="country-flag-large text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mb-4 sm:mb-6">{country.flag}</div>
-              <h1 className="country-title text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-3 sm:mb-4 px-4">{country.name} Visa Services</h1>
-              <p className="country-subtitle text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-200 mb-6 sm:mb-8 lg:mb-10 px-4">
-                Professional visa processing with high success rates
-              </p>
-              {/* Stats Quick View */}
-              <div className="hero-stats flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 lg:gap-8 px-4">
-                <div className="stat-item bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 lg:p-6">
-                  <span className="stat-number block text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1">98%</span>
-                  <span className="stat-label text-xs sm:text-sm lg:text-base text-gray-200">Success Rate</span>
-                </div>
-                <div className="stat-item bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 lg:p-6">
-                  <span className="stat-number block text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1">5-7</span>
-                  <span className="stat-label text-xs sm:text-sm lg:text-base text-gray-200">Days Processing</span>
-                </div>
-                <div className="stat-item bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 lg:p-6">
-                  <span className="stat-number block text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1">{visaTypes.length}</span>
-                  <span className="stat-label text-xs sm:text-sm lg:text-base text-gray-200">Visa Types</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ChildHero
+        title={country.name}
+        subtitle="Your Gateway to Global Adventures"
+        description="Discover our world-class visa categories and expert guidance to navigate the complex visa process with ease."
+        backgroundImage={country.image}
+        showBackButton={true}
+        customClass="child-hero-enhanced"
+      />
+
 
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <section className="visa-categories-section py-8 sm:py-12 lg:py-16 xl:py-20">
           {/* Enhanced Section Header */}
           <div className="section-header-enhanced text-center mb-8 sm:mb-10 lg:mb-12">
             <div className="section-badge inline-block bg-primary-100 text-primary-600 px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">Available Visa Categories</div>
-            <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-[#254d8b] mb-3 sm:mb-4 px-4">Choose Your Perfect Visa Type</h2>
+            <h2 className="font-bold text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-[#254d8b] mb-3 sm:mb-4 px-4">Choose Your Perfect Visa</h2>
             <p className="section-description text-base sm:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto px-4">
               Select from our comprehensive range of visa categories designed to meet your specific travel and business needs
             </p>

@@ -4,7 +4,7 @@
 }
 
 .country-hero {
-  height: 60vh;
+  height: 40vh;
   position: relative;
   overflow: hidden;
   min-height: 400px;
@@ -31,6 +31,8 @@
   display: flex;
   align-items: center;
   color: white;
+  object-fit: cover;
+
 }
 
 .hero-content {

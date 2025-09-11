@@ -1,6 +1,5 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { buildMediaUrl } from '../config/api.js'
 import './ChildHero.css'
 
 const ChildHero = ({ 
@@ -9,7 +8,7 @@ const ChildHero = ({
   description, 
   backButtonText, 
   backButtonPath, 
-  icon, 
+  icon,
   backgroundImage,
   showBackButton = true,
   customClass = ''
@@ -25,48 +24,43 @@ const ChildHero = ({
   }
 
   return (
-    <div className={`child-hero ${customClass}`}>
-      {backgroundImage && (
-        <div className="hero-background">
-          <img src={buildMediaUrl(`/media/${backgroundImage}`)} alt="Hero background" />
-          <div className="hero-overlay"></div>
-        </div>
-      )}
-      
-      <div className="hero-content">
+    <section 
+      className={`child-hero w-[98vw] md:w-[85vw] mx-auto rounded-lg mt-6 ${customClass}`}
+      style={backgroundImage ? { backgroundImage: `url(${backgroundImage})` } : {}}>
+    
+      <div className="child-hero-overlay">
         <div className="container">
           {showBackButton && (
-            <button className="hero-back-button" onClick={handleBack}>
+            <button className="child-hero-back-button" onClick={handleBack}>
               ← {backButtonText || 'Back'}
             </button>
           )}
-          
-          <div className="hero-text-content">
-            {icon && (
-              <div className="hero-icon">
-                {icon}
-              </div>
-            )}
-            
-            <h1 className="hero-title">
-              {title}
-            </h1>
-            
-            {subtitle && (
-              <h2 className="hero-subtitle">
-                {subtitle}
-              </h2>
-            )}
-            
-            {description && (
-              <p className="hero-description">
-                {description}
-              </p>
-            )}
+          <div className="child-hero-content">
+            <div className="child-hero-left">
+              {icon && (
+                <div className="child-hero-icon">
+                  {icon}
+                </div>
+              )}
+              <h1 className="child-hero-title">{title}</h1>
+              {subtitle && (
+                <h2 className="child-hero-subtitle">
+                  {subtitle}
+                </h2>
+              )}
+              {description && (
+                <p className="child-hero-description">
+                  {description}
+                </p>
+              )}
+            </div>
+            <div className="child-hero-right">
+              {/* Right side content can be added here */}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 
