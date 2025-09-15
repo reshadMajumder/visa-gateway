@@ -9,7 +9,7 @@ const VisaDetails = () => {
   const { countryId, visaId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  
+
   const [visaDetails, setVisaDetails] = useState(null)
   const [showApplyModal, setShowApplyModal] = useState(false)
   const country = location.state?.country || {
@@ -46,10 +46,10 @@ const VisaDetails = () => {
   const getNotes = () => {
     return visaDetails?.notes?.map(note => note.notes) || []
   }
-  
+
   const getVisaDetails = () => {
     if (!visaDetails) return {}
-    
+
     return {
       name: visaDetails.name,
       headings: visaDetails.headings,
@@ -57,13 +57,13 @@ const VisaDetails = () => {
       processingTime: visaDetails.expected_processing_time || 'Contact for details'
     }
   }
-  
+
   const details = getVisaDetails()
   const documents = getRequiredDocuments()
   const process = getApplicationProcess()
   const overviews = getOverviews()
   const notes = getNotes()
-  
+
   const handleContactExpert = () => {
     navigate('/contact')
   }
@@ -75,18 +75,18 @@ const VisaDetails = () => {
   const handleApplyNow = () => {
     // Check if user is logged in by checking for access token
     const token = localStorage.getItem('accessToken')
-    
+
     if (!token) {
       // Automatically redirect to login page for non-logged-in users
-      navigate('/login', { 
-        state: { 
+      navigate('/login', {
+        state: {
           from: `/country/${countryId}/visa/${visaId}`,
-          country: country 
-        } 
+          country: country
+        }
       })
       return
     }
-    
+
     // If user is logged in, show the apply modal
     setShowApplyModal(true)
   }
@@ -98,15 +98,15 @@ const VisaDetails = () => {
 
   const handleApplyWithoutDocuments = async () => {
     setShowApplyModal(false)
-    
+
     // Get token from localStorage
     const token = localStorage.getItem('accessToken')
-    
+
     try {
       const formData = new FormData();
       formData.append('country_id', country.id);
       formData.append('visa_type_id', parseInt(visaId));
-      
+
       const response = await fetch(API_ENDPOINTS.VISA_APPLICATIONS, {
         method: 'POST',
         headers: {
@@ -114,7 +114,7 @@ const VisaDetails = () => {
         },
         body: formData
       })
-      
+
       if (response.ok) {
         alert('Application created successfully! You can upload documents later from your account.')
         navigate('/account')
@@ -154,7 +154,7 @@ const VisaDetails = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-8 sm:py-12 rounded-lg mt-5">
+      {/* <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-700 text-white py-8 sm:py-12 rounded-lg mt-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <button 
             onClick={handleBack}
@@ -172,7 +172,7 @@ const VisaDetails = () => {
           </div>
           <p className="text-blue-100 text-base sm:text-lg">Complete visa application guide and requirements</p>
         </div>
-      </div>
+      </div> */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -186,6 +186,14 @@ const VisaDetails = () => {
                 </div>
                 <h2 className="text-lg sm:text-2xl font-bold text-gray-900">Quick Information</h2>
               </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
+                <span className="text-3xl sm:text-4xl">{country.flag}</span>
+                <div>
+                  <div className="text-blue-200 text-xs sm:text-sm font-medium">{country.name}</div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{details.name}</h1>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 sm:p-6 border border-blue-200">
                   <div className="flex items-center space-x-3">
@@ -311,7 +319,7 @@ const VisaDetails = () => {
                 <div className="text-2xl sm:text-3xl font-bold">${details.price || 'Contact for price'}</div>
                 <div className="text-blue-100 text-sm sm:text-base">Per Application</div>
               </div>
-              
+
               <div className="p-4 sm:p-6">
                 <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                   <div className="flex items-center space-x-3">
@@ -333,8 +341,8 @@ const VisaDetails = () => {
                     <span className="text-sm sm:text-base text-gray-700">Application tracking</span>
                   </div>
                 </div>
-                
-                <button 
+
+                <button
                   onClick={handleApplyNow}
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
                 >
@@ -353,7 +361,7 @@ const VisaDetails = () => {
                 <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 leading-relaxed">
                   Our visa experts are here to assist you with your application. Get personalized guidance and support throughout the process.
                 </p>
-                <button 
+                <button
                   onClick={handleContactExpert}
                   className="w-full bg-blue-600 text-white py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors text-sm sm:text-base"
                 >
@@ -372,9 +380,9 @@ const VisaDetails = () => {
               <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Choose Your Application Method</h3>
               <p className="text-sm sm:text-base text-gray-600">Select how you'd like to proceed with your visa application</p>
             </div>
-            
+
             <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
-              <button 
+              <button
                 onClick={handleApplyWithDocuments}
                 className="w-full p-4 sm:p-6 bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl hover:from-blue-100 hover:to-blue-200 transition-all duration-300 group"
               >
@@ -388,8 +396,8 @@ const VisaDetails = () => {
                   </div>
                 </div>
               </button>
-              
-              <button 
+
+              <button
                 onClick={handleApplyWithoutDocuments}
                 className="w-full p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl hover:from-gray-100 hover:to-gray-200 transition-all duration-300 group"
               >
@@ -404,8 +412,8 @@ const VisaDetails = () => {
                 </div>
               </button>
             </div>
-            
-            <button 
+
+            <button
               onClick={() => setShowApplyModal(false)}
               className="w-full py-2.5 sm:py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors text-sm sm:text-base"
             >

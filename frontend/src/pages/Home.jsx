@@ -85,6 +85,9 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Countries Section */}
+      <CountryCards />
+
       {/* Features Section */}
       <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -120,8 +123,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Countries Section */}
-      <CountryCards />
+
 
       {/* Services Section */}
       <section className="py-8 sm:py-12 lg:py-16 xl:py-20 bg-white">
