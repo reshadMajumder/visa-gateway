@@ -28,7 +28,7 @@ const VisaTypesCard = ({ visa, country, index, isLoaded }) => {
     >
       <div className="visa-card-image">
         <img 
-          src={buildMediaUrl(visa.image)} 
+          src={visa.image} 
           alt={visa.name}
           onError={(e) => {
             e.target.style.display = 'none'

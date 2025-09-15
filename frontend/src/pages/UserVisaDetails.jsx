@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { API_ENDPOINTS, buildMediaUrl } from '../config/api.js'
+import { Upload, RefreshCw } from 'lucide-react'
 import './css/UserVisaDetails.css'
 
 const UserVisaDetails = () => {
@@ -9,10 +10,9 @@ const UserVisaDetails = () => {
   const [application, setApplication] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    fetchApplicationDetails()
-  }, [applicationId, fetchApplicationDetails])
+  const [updatingDocuments, setUpdatingDocuments] = useState({})
+  const [documentFiles, setDocumentFiles] = useState({})
+  const [updateStatus, setUpdateStatus] = useState({ loading: false, success: null, error: null })
 
   const fetchApplicationDetails = useCallback(async () => {
     try {
@@ -25,7 +25,7 @@ const UserVisaDetails = () => {
         return
       }
 
-      const response = await fetch(`${API_ENDPOINTS.VISA_APPLICATIONS}/${applicationId}/`, {
+      const response = await fetch(`${API_ENDPOINTS.VISA_APPLICATIONS}${applicationId}/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -51,6 +51,10 @@ const UserVisaDetails = () => {
       setLoading(false)
     }
   }, [applicationId])
+
+  useEffect(() => {
+    fetchApplicationDetails()
+  }, [fetchApplicationDetails])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -98,6 +102,93 @@ const UserVisaDetails = () => {
       case 'approved': return '#10b981'
       case 'rejected': return '#ef4444'
       default: return '#6b7280'
+    }
+  }
+  
+  const handleDocumentFileChange = (documentId, e) => {
+    if (e.target.files && e.target.files[0]) {
+      setDocumentFiles(prev => ({
+        ...prev,
+        [documentId]: e.target.files[0]
+      }))
+    }
+  }
+  
+  // Clear notification after a few seconds
+  useEffect(() => {
+    if (updateStatus.success || updateStatus.error) {
+      const timer = setTimeout(() => {
+        setUpdateStatus({ loading: false, success: null, error: null })
+      }, 5000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [updateStatus.success, updateStatus.error])
+  
+  const handleUpdateDocument = async (documentId) => {
+    if (!documentFiles[documentId]) {
+      setUpdateStatus({
+        loading: false,
+        success: null,
+        error: 'Please select a file to upload'
+      })
+      return
+    }
+    
+    try {
+      setUpdateStatus({ loading: true, success: null, error: null })
+      setUpdatingDocuments(prev => ({ ...prev, [documentId]: true }))
+      
+      const accessToken = localStorage.getItem('accessToken')
+      if (!accessToken) {
+        setError('Please login to update documents')
+        return
+      }
+      
+      const formData = new FormData()
+      // match v2 API: send PUT to same endpoint as GET with required_documents[docId]
+      formData.append('visa_type_id', application.visa_type.id)
+      formData.append('country_id', application.country.id)
+      formData.append(`required_documents[${documentId}]`, documentFiles[documentId])
+      
+      const response = await fetch(`${API_ENDPOINTS.VISA_APPLICATIONS}${applicationId}/`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: formData
+      })
+      
+      if (response.ok) {
+        setUpdateStatus({
+          loading: false,
+          success: 'Document updated successfully',
+          error: null
+        })
+        // Refresh application data
+        fetchApplicationDetails()
+      } else if (response.status === 401) {
+        setError('Session expired. Please login again.')
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        localStorage.removeItem('user')
+        window.location.href = '/login'
+      } else {
+        const errorData = await response.json()
+        setUpdateStatus({
+          loading: false,
+          success: null,
+          error: errorData.detail || 'Failed to update document'
+        })
+      }
+    } catch (err) {
+      setUpdateStatus({
+        loading: false,
+        success: null,
+        error: 'Network error. Please try again.'
+      })
+    } finally {
+      setUpdatingDocuments(prev => ({ ...prev, [documentId]: false }))
     }
   }
 
@@ -233,6 +324,17 @@ const UserVisaDetails = () => {
               </div>
             )}
 
+            {/* Success/Error Notification */}
+            {(updateStatus.success || updateStatus.error) && (
+              <div className={`bg-white rounded-2xl shadow-xl border ${updateStatus.success ? 'border-green-200' : 'border-red-200'} p-4 sm:p-6 mb-4 sm:mb-6`}>
+                <div className={`flex items-center space-x-2 ${updateStatus.success ? 'text-green-600' : 'text-red-600'}`}>
+                  <span className="text-sm sm:text-base font-medium">
+                    {updateStatus.success || updateStatus.error}
+                  </span>
+                </div>
+              </div>
+            )}
+            
             {application.visa_type.required_documents && application.visa_type.required_documents.length > 0 && (
               <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-4 sm:p-6 lg:p-8">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Uploaded Documents</h2>
@@ -262,6 +364,54 @@ const UserVisaDetails = () => {
                         <div className="mt-3 p-3 bg-red-50 rounded-lg">
                           <span className="text-xs sm:text-sm font-medium text-red-700">Rejection: </span>
                           <span className="text-xs sm:text-sm text-red-600">{doc.rejection_reason}</span>
+                        </div>
+                      )}
+                      
+                      {doc.admin_notes && (
+                        <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                          <span className="text-xs sm:text-sm font-medium text-blue-700">Admin Notes: </span>
+                          <span className="text-xs sm:text-sm text-blue-600">{doc.admin_notes}</span>
+                        </div>
+                      )}
+                      
+                      {/* Document update section for rejected documents */}
+                      {doc.status === 'rejected' && (
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                          <p className="text-sm font-medium text-gray-700 mb-2">Update Document</p>
+                          <div className="flex flex-col space-y-3">
+                            <label className="flex items-center justify-center w-full px-4 py-2 bg-white border-2 border-blue-300 border-dashed rounded-lg cursor-pointer hover:bg-blue-50 transition-colors duration-300">
+                              <input 
+                                type="file" 
+                                className="hidden" 
+                                onChange={(e) => handleDocumentFileChange(doc.id, e)}
+                                accept=".pdf,.jpg,.jpeg,.png"
+                              />
+                              <div className="flex items-center space-x-2">
+                                <Upload className="w-4 h-4 text-blue-600" />
+                                <span className="text-sm text-blue-600">
+                                  {documentFiles[doc.id] ? documentFiles[doc.id].name : 'Choose File'}
+                                </span>
+                              </div>
+                            </label>
+                            
+                            <button
+                              onClick={() => handleUpdateDocument(doc.id)}
+                              disabled={!documentFiles[doc.id] || updatingDocuments[doc.id]}
+                              className="flex items-center justify-center space-x-2 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300 disabled:bg-blue-300 disabled:cursor-not-allowed"
+                            >
+                              {updatingDocuments[doc.id] ? (
+                                <>
+                                  <RefreshCw className="w-4 h-4 animate-spin" />
+                                  <span>Updating...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Upload className="w-4 h-4" />
+                                  <span>Update Document</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>

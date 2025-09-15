@@ -90,25 +90,30 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
       
       const accessToken = localStorage.getItem('accessToken')
       const formData = new FormData()
-      
-      // Add required fields for v2 API
+
+      // Common required fields
       formData.append('visa_type_id', application.visa_type.id.toString())
       formData.append('country_id', application.country.id.toString())
-      
-      // Get documents to upload (missing documents or all required documents for draft)
-      const documentsToUpload = application.status === 'draft' 
-        ? application.visa_type.required_documents 
+
+      // Always use PUT with required_documents[docId]
+      const documentsToUpload = application.status === 'draft' || application.status === 'rejected'
+        ? application.visa_type.required_documents
         : getMissingDocuments()
-      
-      // Add files using the new format: required_documents[document_id]
+
+      let appendedAny = false
       documentsToUpload.forEach(doc => {
         const file = selectedFiles[doc.id]
         if (file) {
+          appendedAny = true
           formData.append(`required_documents[${doc.id}]`, file)
         }
       })
 
-      const response = await fetch(`${API_ENDPOINTS.VISA_APPLICATIONS}/${application.id}/`, {
+      if (!appendedAny) {
+        throw new Error('Please select at least one document to upload')
+      }
+
+      const response = await fetch(`${API_ENDPOINTS.VISA_APPLICATIONS}${application.id}/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -122,8 +127,6 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
         setUploadError('')
         setShowUploadSection(false)
         onUploadSuccess && onUploadSuccess()
-        
-        // Show success message from API response
         const successMessage = result.message || (application.status === 'draft' 
           ? 'Documents uploaded successfully! Application status updated to submitted.'
           : 'Documents updated successfully!')
@@ -132,11 +135,12 @@ const VisaApplicationCard = ({ application, onUploadSuccess, onUploadError }) =>
         setUploadError('Session expired. Please login again.')
         onUploadError && onUploadError('Session expired. Please login again.')
       } else {
-        const errorData = await response.json()
+        const errorData = await response.json().catch(() => ({}))
         const errorMessage = errorData.error || errorData.message || 'Failed to upload documents'
         setUploadError(errorMessage)
         onUploadError && onUploadError(errorMessage)
       }
+
     } catch (error) {
       const errorMessage = 'Network error. Please try again.'
       setUploadError(errorMessage)
