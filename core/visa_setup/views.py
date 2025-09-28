@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .serializers import VisaTypeSerializer, CountrySerializer, DetailedVisaTypeSerializer, VisaApplicationSerializer,UserVisaApplicationSerializer
+from .serializers import VisaTypeSerializer, CountrySerializer, DetailedVisaTypeSerializer, VisaApplicationSerializer,UserVisaApplicationSerializer,CountryDetailsSerializer
 from .models import VisaType, Country, VisaApplication, RequiredDocuments, ApplicationDocument
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -29,7 +29,7 @@ class CountryView(APIView):
                         {"error": "Country not found"},
                         status=status.HTTP_404_NOT_FOUND
                     )
-                serializer = CountrySerializer(country, context={'request': request})
+                serializer = CountryDetailsSerializer(country, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response(

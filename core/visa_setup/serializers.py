@@ -53,7 +53,7 @@ class VisaTypeSerializer(serializers.ModelSerializer):
     def get_image(self, obj):
         return obj.image if obj.image else None
 
-class CountrySerializer(serializers.ModelSerializer):
+class CountryDetailsSerializer(serializers.ModelSerializer):
     types = VisaTypeSerializer(many=True)
     image = serializers.SerializerMethodField()
 
@@ -67,7 +67,17 @@ class CountrySerializer(serializers.ModelSerializer):
 
 
 
+class CountrySerializer(serializers.ModelSerializer):
+    # types = VisaTypeSerializer(many=True)
+    image = serializers.SerializerMethodField()
 
+    class Meta:
+        model = Country
+        fields = ['id', 'name', 'description', 'image',
+                 'code',  'created_at', 'updated_at']
+
+    def get_image(self, obj):
+        return obj.image if obj.image else None
 
 
 class VisaApplicationSerializer(serializers.ModelSerializer):
