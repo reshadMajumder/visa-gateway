@@ -5,8 +5,8 @@ import mimetypes
 from pathlib import Path
 
 # NOTE: Env var name kept as-is to match existing project configuration
-SUPABASE_URL = os.getenv("SUPABASE_URl")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")  # Use service role key for upload access
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://sbkpzuzuobfsibbsgehq.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNia3B6dXp1b2Jmc2liYnNnZWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1NzM5MDUsImV4cCI6MjA3MDE0OTkwNX0.xBFREBPWWfuwGRn_bvZBvyqVQ1ul90fWoYOwga4DjnU")  # Use service role key for upload access
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
