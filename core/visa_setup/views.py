@@ -304,6 +304,22 @@ class VisaApplicationView(APIView):
             application.status = 'submitted'
             application.save()
             
+            # Invalidate and warm user-specific caches
+            user_cache_list_key = f"user:{request.user.id}:applications"
+            user_cache_detail_key = f"user:{request.user.id}:application:{application_id}"
+            cache.delete(user_cache_list_key)
+            cache.delete(user_cache_detail_key)
+            # Warm detail
+            application_refreshed = VisaApplication.objects.filter(id=application_id, user=request.user).select_related('country', 'visa_type', 'user').prefetch_related('documents__required_document').first()
+            if application_refreshed:
+                data_detail = VisaApplicationSerializer(application_refreshed).data
+                cache.set(user_cache_detail_key, data_detail, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            # Warm list
+            applications_qs = VisaApplication.objects.filter(user=request.user).select_related('country', 'visa_type', 'user').prefetch_related('documents__required_document')
+            data_list = VisaApplicationSerializer(applications_qs, many=True).data
+            cache.set(user_cache_list_key, data_list, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            logger.info("Invalidated and rewarmed cache keys: %s, %s", user_cache_list_key, user_cache_detail_key)
+
             return Response({
                 "message": "Application updated successfully with all required documents",
                 "application": VisaApplicationSerializer(application).data
@@ -323,6 +339,12 @@ class VisaApplicationView(APIView):
         """Get all visa applications or specific application for the logged-in user with documents"""
         if application_id:
             try:
+                cache_key = f"user:{request.user.id}:application:{application_id}"
+                cached = cache.get(cache_key)
+                if cached is not None:
+                    logger.info("Serving user application %s from cache for user %s", application_id, request.user.id)
+                    return Response(cached, status=status.HTTP_200_OK)
+
                 visa_application = VisaApplication.objects.filter(
                     id=application_id, 
                     user=request.user
@@ -334,16 +356,28 @@ class VisaApplicationView(APIView):
                     return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
                 
                 serializer = VisaApplicationSerializer(visa_application)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                data = serializer.data
+                cache.set(cache_key, data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                logger.info("Cached user application %s for user %s", application_id, request.user.id)
+                return Response(data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             """Get all visa applications for the logged-in user with documents"""
+            cache_key = f"user:{request.user.id}:applications"
+            cached = cache.get(cache_key)
+            if cached is not None:
+                logger.info("Serving user applications list from cache for user %s", request.user.id)
+                return Response({"message":"Applications fetched successfully", "Applications:": cached}, status=status.HTTP_200_OK)
+
             visa_applications = VisaApplication.objects.filter(user=request.user).select_related(
                 'country', 'visa_type', 'user'
             ).prefetch_related('documents__required_document')
             serializer = VisaApplicationSerializer(visa_applications, many=True)
-            return Response({"message":"Applications fetched successfully", "Applications:":serializer.data}, status=status.HTTP_200_OK)
+            data = serializer.data
+            cache.set(cache_key, data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            logger.info("Cached user applications list for user %s", request.user.id)
+            return Response({"message":"Applications fetched successfully", "Applications:": data}, status=status.HTTP_200_OK)
 
 
 
@@ -355,6 +389,12 @@ class UserVisaApplicationView(APIView):
         """Get all visa applications or specific application for the logged-in user with documents"""
         if application_id:
             try:
+                cache_key = f"user:{request.user.id}:application:{application_id}"
+                cached = cache.get(cache_key)
+                if cached is not None:
+                    logger.info("Serving v2 user application %s from cache for user %s", application_id, request.user.id)
+                    return Response(cached, status=status.HTTP_200_OK)
+
                 visa_application = VisaApplication.objects.filter(
                     id=application_id, 
                     user=request.user
@@ -366,21 +406,44 @@ class UserVisaApplicationView(APIView):
                     return Response({"error": "Application not found"}, status=status.HTTP_404_NOT_FOUND)
                 
                 serializer = UserVisaApplicationSerializer(visa_application)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                data = serializer.data
+                cache.set(cache_key, data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                logger.info("Cached v2 user application %s for user %s", application_id, request.user.id)
+                return Response(data, status=status.HTTP_200_OK)
             except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             """Get all visa applications for the logged-in user with documents"""
+            cache_key = f"user:{request.user.id}:applications"
+            cached = cache.get(cache_key)
+            if cached is not None:
+                logger.info("Serving v2 user applications list from cache for user %s", request.user.id)
+                return Response({"message":"Applications fetched successfully", "Applications:":cached}, status=status.HTTP_200_OK)
+
             visa_applications = VisaApplication.objects.filter(user=request.user).select_related(
                 'country', 'visa_type', 'user'
             ).prefetch_related('documents__required_document')
             serializer = UserVisaApplicationSerializer(visa_applications, many=True)
-            return Response({"message":"Applications fetched successfully", "Applications:":serializer.data}, status=status.HTTP_200_OK)
+            data = serializer.data
+            cache.set(cache_key, data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            logger.info("Cached v2 user applications list for user %s", request.user.id)
+            return Response({"message":"Applications fetched successfully", "Applications:":data}, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = UserVisaApplicationSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             visa_application = serializer.save()
+            list_key = f"user:{request.user.id}:applications"
+            detail_key = f"user:{request.user.id}:application:{visa_application.id}"
+            cache.delete(list_key)
+            cache.delete(detail_key)
+            # Warm detail and list
+            data_detail = UserVisaApplicationSerializer(visa_application).data
+            cache.set(detail_key, data_detail, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            apps_qs = VisaApplication.objects.filter(user=request.user).select_related('country', 'visa_type', 'user').prefetch_related('documents__required_document')
+            data_list = UserVisaApplicationSerializer(apps_qs, many=True).data
+            cache.set(list_key, data_list, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            logger.info("Invalidated and rewarmed v2 cache keys after create: %s, %s", list_key, detail_key)
             return Response({
                 "message": "Application created successfully",
                 "Application": UserVisaApplicationSerializer(visa_application).data

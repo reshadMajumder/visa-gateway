@@ -86,7 +86,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 # Caching
 # Use local-memory cache by default. Override via environment in production if needed.
-CACHE_DEFAULT_TTL = int(os.getenv('CACHE_DEFAULT_TIMEOUT', '300'))
+# Default TTL set to 30 days
+CACHE_DEFAULT_TTL = int(os.getenv('CACHE_DEFAULT_TIMEOUT', str(60 * 60 * 24 * 30)))
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
