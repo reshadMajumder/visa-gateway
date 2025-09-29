@@ -1,0 +1,58 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A travel-themed flat lay with a map, passport, and camera.",
+      "imageUrl": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3",
+      "imageHint": "travel flatlay"
+    },
+    {
+      "id": "hero-dublin",
+      "description": "Ha'penny Bridge in Dublin",
+      "imageUrl": "https://images.unsplash.com/photo-1541582287445-36a4a580a4a8?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "dublin bridge"
+    },
+    {
+      "id": "team",
+      "description": "A diverse group of professionals in a meeting.",
+      "imageUrl": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "diverse team"
+    },
+    {
+      "id": "usa",
+      "description": "Statue of Liberty",
+      "imageUrl": "https://images.unsplash.com/photo-1541336032412-2048a678540d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxuZXclMjB5b3JrfGVufDB8fHx8MTc1ODcyNTczNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "new york"
+    },
+    {
+      "id": "canada",
+      "description": "A lake in Banff National Park",
+      "imageUrl": "https://images.unsplash.com/photo-1630618357986-18c558231dd0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjYW5hZGF8ZW58MHx8fHwxNzU4NzM0MTEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "canada lake"
+    },
+    {
+      "id": "uk",
+      "description": "The Big Ben in London",
+      "imageUrl": "https://images.unsplash.com/photo-1529655683826-1c21ef24a49f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxsb25kb258ZW58MHx8fHwxNzU4NzM0MTEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "london"
+    },
+    {
+      "id": "australia",
+      "description": "Sydney Opera House",
+      "imageUrl": "https://images.unsplash.com/photo-1524293581273-79a029562c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhdXN0cmFsaWF8ZW58MHx8fHwxNzU4NzM0MTEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sydney"
+    },
+    {
+      "id": "japan",
+      "description": "Mount Fuji",
+      "imageUrl": "https://images.unsplash.com/photo-1542051841857-5f90071e7989?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxqYXBhbnxlbnwwfHx8fDE3NTg3MzQxMTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "japan"
+    },
+    {
+      "id": "romania",
+      "description": "A castle in Romania",
+      "imageUrl": "https://images.unsplash.com/photo-1554162349-7fe3c5f49557?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "imageHint": "romania castle"
+    }
+  ]
+}
