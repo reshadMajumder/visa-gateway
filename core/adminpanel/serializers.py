@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from accounts.models import User
 
 from visa_setup.models import (
-    VisaType, Country, VisaProcess, VisaOverview, Notes, 
+    Consultation, Settings, VisaType, Country, VisaProcess, VisaOverview, Notes, 
     RequiredDocuments, VisaApplication, ApplicationDocument
 )
 
@@ -328,3 +328,16 @@ class UserVisaApplicationSerializer(serializers.ModelSerializer):
                     continue
 
         return application
+
+
+
+class ConsultationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Consultation
+        fields = ['id', 'scheduled_at', 'email_or_phone', 'preferred_country', 'close', 'notes', 'created_at', 'updated_at']
+
+class SettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Settings
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']

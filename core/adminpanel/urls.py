@@ -11,6 +11,8 @@ from .views import (
     VisaTypeFormDataView, CountryFormDataView,
     CountriesWithVisaTypesView, BulkVisaTypeAssignmentView,
     UserVisaApplicationView,
+    ConsultationAPIView,
+    SettingsView,
 )
 
 urlpatterns = [
@@ -50,5 +52,9 @@ urlpatterns = [
 
     path('visa-applications/', UserVisaApplicationView.as_view(), name='visa-application-list'),
     path('visa-applications/<int:application_id>/', UserVisaApplicationView.as_view(), name='visa-application-detail'),
+    path('consultations/', ConsultationAPIView.as_view(), name='consultation-list'),
+    path('consultations/<int:consultation_id>/', ConsultationAPIView.as_view(), name='consultation-detail'),
+    path('settings/', SettingsView.as_view(), name='settings'),
+
 
 ]

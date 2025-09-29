@@ -126,3 +126,32 @@ class ApplicationDocument(models.Model):
     class Meta:
         unique_together = ['application', 'required_document']
 
+
+
+
+class Consultation(models.Model):
+    scheduled_at = models.DateTimeField()
+    email_or_phone = models.CharField(max_length=35, blank=True)
+    preferred_country = models.CharField(max_length=100, blank=True)
+    notes = models.TextField(blank=True,null=True)
+    close = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Consultation for {self.email_or_phone} on {self.scheduled_at}"
+
+    class Meta:
+        ordering = ['-scheduled_at']
+
+
+class Settings(models.Model):
+    address = models.TextField(default='', blank=True)
+    email = models.EmailField(default='', blank=True)
+    email2 = models.EmailField(default='', blank=True, null=True)
+    phone_number = models.CharField(max_length=15, default='', blank=True)
+    phone_number2 = models.CharField(max_length=15, default='', blank=True, null=True)
+
+
+    def __str__(self):
+        return self.email

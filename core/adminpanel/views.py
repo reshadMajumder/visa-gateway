@@ -3,11 +3,13 @@ from rest_framework.response import Response
 from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.permissions import AllowAny
+
+from .serializers import ConsultationSerializer, SettingsSerializer
 from .permissions import IsSuperUser
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from django.shortcuts import get_object_or_404
-from visa_setup.models import Notes, VisaProcess, VisaOverview, RequiredDocuments,Country, VisaType,VisaApplication,ApplicationDocument
+from visa_setup.models import Consultation, Notes, Settings, VisaProcess, VisaOverview, RequiredDocuments,Country, VisaType,VisaApplication,ApplicationDocument
 from .serializers import (
     AdminUserSerializer,
     NotesSerializer,
@@ -853,3 +855,83 @@ class UserVisaApplicationView(APIView):
 
 
 
+class ConsultationAPIView(APIView):
+    permission_classes = [IsSuperUser]
+
+    def get(self, request, consultation_id=None):
+        """Get all consultations or a specific consultation"""
+        if consultation_id:
+            try:
+                consultation = Consultation.objects.get(pk=consultation_id)
+                serializer = ConsultationSerializer(consultation)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Consultation.DoesNotExist:
+                return Response({"error": "Consultation not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            consultations = Consultation.objects.all().order_by('-created_at')
+            serializer = ConsultationSerializer(consultations, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """Create a new consultation"""
+        serializer = ConsultationSerializer(data=request.data)
+        if serializer.is_valid():
+            consultation = serializer.save()
+            return Response({
+                "message": "Consultation created successfully",
+                "consultation": ConsultationSerializer(consultation).data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, consultation_id=None):
+        """Update an existing consultation"""
+        if not consultation_id:
+            return Response({'error': 'Consultation ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            consultation = Consultation.objects.get(pk=consultation_id)
+        except Consultation.DoesNotExist:
+            return Response({'error': 'Consultation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ConsultationSerializer(consultation, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'Consultation updated successfully',
+                'consultation': ConsultationSerializer(consultation).data
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, consultation_id=None):
+        """Delete a consultation"""
+        if not consultation_id:
+            return Response({'error': 'Consultation ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            consultation = Consultation.objects.get(pk=consultation_id)
+            consultation.delete()
+            return Response({'message': 'Consultation deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except Consultation.DoesNotExist:
+            return Response({'error': 'Consultation not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+            
+
+class SettingsView(APIView):
+    """
+    only one settings object will be created
+    Get or update application settings
+    """
+    def get(self, request):
+        settings = Settings.objects.first()
+        serializer = SettingsSerializer(settings)
+        return Response(serializer.data)
+
+    def put(self, request):
+        settings = Settings.objects.first()
+        serializer = SettingsSerializer(settings, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

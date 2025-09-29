@@ -1,7 +1,7 @@
 
 from django.urls import path, include
 
-from .views import VisaTypeView, CountryView,CountryVisaTypesView, VisaApplicationView,UserVisaApplicationView
+from .views import SettingsView, VisaTypeView, CountryView,CountryVisaTypesView, VisaApplicationView,UserVisaApplicationView,BookConsultationView
 
 
 urlpatterns = [
@@ -15,4 +15,8 @@ urlpatterns = [
 
     path('v2/visa-applications/', UserVisaApplicationView.as_view(), name='visa-application-list'),
     path('v2/visa-applications/<int:application_id>/', UserVisaApplicationView.as_view(), name='visa-application-detail'),
+    path('settings/', SettingsView.as_view(), name='settings'),
+    path('book-consultation/', BookConsultationView.as_view(), name='book-consultation'),
+    
+    
 ]

@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .serializers import VisaTypeSerializer, CountrySerializer, DetailedVisaTypeSerializer, VisaApplicationSerializer,UserVisaApplicationSerializer,CountryDetailsSerializer
-from .models import VisaType, Country, VisaApplication, RequiredDocuments, ApplicationDocument
+from .serializers import ConsultationSerializer, SettingsSerializer, VisaTypeSerializer, CountrySerializer, DetailedVisaTypeSerializer, VisaApplicationSerializer,UserVisaApplicationSerializer,CountryDetailsSerializer
+from .models import Settings, VisaType, Country, VisaApplication, RequiredDocuments, ApplicationDocument
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -393,4 +393,33 @@ class UserVisaApplicationView(APIView):
         else:
             return Response({'error': 'No valid document found to update'}, status=400)
 
+
+# lets implement book a consultation 
+class BookConsultationView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = ConsultationSerializer(data=request.data)
+        if serializer.is_valid():
+            consultation = serializer.save()
+            return Response({
+                "message": "Consultation booked successfully, our team will contact you soon",
+                "consultation": ConsultationSerializer(consultation).data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class SettingsView(APIView):
+    
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            settings = Settings.objects.first()
+            if not settings:
+                return Response({"error": "Settings not configured"}, status=status.HTTP_404_NOT_FOUND)
+            serializer = SettingsSerializer(settings)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
