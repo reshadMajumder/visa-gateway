@@ -7,9 +7,20 @@ from rest_framework.permissions import AllowAny
 from .serializers import ConsultationSerializer, SettingsSerializer
 from .permissions import IsSuperUser
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.cache import cache
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 from django.shortcuts import get_object_or_404
 from visa_setup.models import Consultation, Notes, Settings, VisaProcess, VisaOverview, RequiredDocuments,Country, VisaType,VisaApplication,ApplicationDocument
+from django.db.models.signals import post_save, post_delete, m2m_changed
+from django.core.cache import cache
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 from .serializers import (
     AdminUserSerializer,
     NotesSerializer,
@@ -361,6 +372,7 @@ class CountryDetailView(APIView):
         serializer = CountrySerializer(country, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            # Optional: ensure cache is fresh immediately (signals already clear + warm)
             return Response(CountrySerializer(country).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -447,6 +459,7 @@ class VisaTypeDetailView(APIView):
         serializer = VisaTypeSerializer(visa_type, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            # Optional: ensure cache is fresh immediately (signals already clear + warm)
             return Response(VisaTypeSerializer(visa_type).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -678,6 +691,16 @@ class UserVisaApplicationView(APIView):
         serializer = UserVisaApplicationSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             visa_application = serializer.save()
+            # Invalidate and warm per-user caches
+            user_id = visa_application.user_id
+            list_key = f"user:{user_id}:applications"
+            detail_key = f"user:{user_id}:application:{visa_application.id}"
+            cache.delete(list_key)
+            cache.delete(detail_key)
+            cache.set(detail_key, UserVisaApplicationSerializer(visa_application).data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            apps_qs = VisaApplication.objects.filter(user_id=user_id).select_related('country', 'visa_type', 'user').prefetch_related('documents__required_document')
+            cache.set(list_key, UserVisaApplicationSerializer(apps_qs, many=True).data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            logger.info("Admin created application %s; rewarmed cache: %s, %s", visa_application.id, list_key, detail_key)
             return Response({
                 "message": "Application created successfully",
                 "Application": UserVisaApplicationSerializer(visa_application).data
@@ -832,6 +855,16 @@ class UserVisaApplicationView(APIView):
                 updated = True
 
         if updated:
+            # Invalidate and warm per-user caches
+            user_id = app.user_id
+            list_key = f"user:{user_id}:applications"
+            detail_key = f"user:{user_id}:application:{app.id}"
+            cache.delete(list_key)
+            cache.delete(detail_key)
+            cache.set(detail_key, UserVisaApplicationSerializer(app).data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            apps_qs = VisaApplication.objects.filter(user_id=user_id).select_related('country', 'visa_type', 'user').prefetch_related('documents__required_document')
+            cache.set(list_key, UserVisaApplicationSerializer(apps_qs, many=True).data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            logger.info("Admin updated application %s; rewarmed cache: %s, %s", app.id, list_key, detail_key)
             return Response({
                 'message': 'Application updated successfully',
                 'application': UserVisaApplicationSerializer(app).data
@@ -846,7 +879,15 @@ class UserVisaApplicationView(APIView):
         
         try:
             app = VisaApplication.objects.get(pk=application_id)
+            user_id = app.user_id
             app.delete()
+            # Invalidate and warm list cache (detail no longer exists)
+            list_key = f"user:{user_id}:applications"
+            detail_key = f"user:{user_id}:application:{application_id}"
+            cache.delete(detail_key)
+            apps_qs = VisaApplication.objects.filter(user_id=user_id).select_related('country', 'visa_type', 'user').prefetch_related('documents__required_document')
+            cache.set(list_key, UserVisaApplicationSerializer(apps_qs, many=True).data, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+            logger.info("Admin deleted application %s; rewarmed list cache: %s and cleared %s", application_id, list_key, detail_key)
             return Response({'message': 'Application deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
         except VisaApplication.DoesNotExist:
             return Response({'error': 'Application not found'}, status=status.HTTP_404_NOT_FOUND)
