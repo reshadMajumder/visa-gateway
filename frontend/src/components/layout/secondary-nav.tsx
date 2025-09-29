@@ -63,7 +63,8 @@ export function SecondaryNav() {
                     {visas.map((visa) => (
                       <DropdownMenuItem key={visa.slug} asChild>
                         <Link href={`/visas/${visa.slug}`}>
-                          {visa.flag} {visa.country}
+                          <span className="text-xs mr-1 text-muted-foreground">{visa.countryCode}</span>
+                          {visa.country}
                         </Link>
                       </DropdownMenuItem>
                     ))}
