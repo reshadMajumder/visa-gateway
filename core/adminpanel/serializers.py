@@ -134,6 +134,12 @@ class VisaTypeSerializer(serializers.ModelSerializer):
         return instance
 
 
+class countrybaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
 class CountrySerializer(serializers.ModelSerializer):
     types = VisaTypeSerializer(many=True, read_only=True)
     type_ids = CommaSeparatedIdsField(VisaType, required=False, allow_blank=True)

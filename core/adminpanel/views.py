@@ -4,7 +4,7 @@ from rest_framework import status, permissions
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework.permissions import AllowAny
 
-from .serializers import ConsultationSerializer, SettingsSerializer
+from .serializers import ConsultationSerializer, SettingsSerializer,countrybaseSerializer
 from .permissions import IsSuperUser
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.core.cache import cache
@@ -303,7 +303,7 @@ class CountryListCreateView(APIView):
 
     def get(self, request):
         countries = Country.objects.all()
-        serializer = CountrySerializer(countries, many=True)
+        serializer = countrybaseSerializer(countries, many=True)
         return Response(serializer.data)
 
     def post(self, request):
