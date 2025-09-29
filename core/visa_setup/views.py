@@ -7,6 +7,11 @@ from .serializers import ConsultationSerializer, SettingsSerializer, VisaTypeSer
 from .models import Settings, VisaType, Country, VisaApplication, RequiredDocuments, ApplicationDocument
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.cache import cache
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -21,9 +26,16 @@ class CountryView(APIView):
     def get(self, request, id=None):
         if id:
             try:
-                country = Country.objects.filter(id=id, active=True).prefetch_related(
-                    'types'
-                ).first()
+                cache_key = f"country:{id}"
+                country = cache.get(cache_key)
+                if country is not None:
+                    logger.info("Serving country %s from cache", id)
+                if country is None:
+                    country = Country.objects.filter(id=id, active=True).prefetch_related(
+                        'types'
+                    ).first()
+                    cache.set(cache_key, country, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                    logger.info("Cached country %s", id)
                 if not country:
                     return Response(
                         {"error": "Country not found"},
@@ -37,9 +49,21 @@ class CountryView(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 ) 
         try:
-            countries = Country.objects.filter(active=True).prefetch_related(
-                'types'
-            )
+            cache_key = "countries:active"
+            countries = cache.get(cache_key)
+            if countries is not None:
+                logger.info("Serving countries list from cache")
+            if countries is None:
+                countries_qs = Country.objects.filter(active=True).prefetch_related(
+                    'types'
+                )
+                countries_list = list(countries_qs)
+                cache.set(cache_key, countries_list, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                for c in countries_list:
+                    per_country_key = f"country:{c.id}"
+                    cache.set(per_country_key, c, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                logger.info("Cached countries list and hydrated %d country detail entries", len(countries_list))
+                countries = countries_list
             serializer = CountrySerializer(countries, many=True, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -59,9 +83,16 @@ class VisaTypeView(APIView):
     def get(self, request, id=None):
         if id:
             try:
-                visa_type = VisaType.objects.filter(id=id, active=True).prefetch_related(
-                    'processes', 'overviews', 'notes', 'required_documents'
-                ).first()
+                cache_key = f"visa_type:{id}"
+                visa_type = cache.get(cache_key)
+                if visa_type is not None:
+                    logger.info("Serving visa type %s from cache", id)
+                if visa_type is None:
+                    visa_type = VisaType.objects.filter(id=id, active=True).prefetch_related(
+                        'processes', 'overviews', 'notes', 'required_documents'
+                    ).first()
+                    cache.set(cache_key, visa_type, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                    logger.info("Cached visa type %s", id)
                 if not visa_type:
                     return Response(
                         {"error": "Visa type not found"},
@@ -76,9 +107,16 @@ class VisaTypeView(APIView):
                 )
         else:
             try:
-                visa_types = VisaType.objects.filter(active=True).prefetch_related(
-                    'processes', 'overviews', 'notes', 'required_documents'
-                )
+                cache_key = "visa_types:active"
+                visa_types = cache.get(cache_key)
+                if visa_types is not None:
+                    logger.info("Serving visa types list from cache")
+                if visa_types is None:
+                    visa_types = VisaType.objects.filter(active=True).prefetch_related(
+                        'processes', 'overviews', 'notes', 'required_documents'
+                    )
+                    cache.set(cache_key, list(visa_types), getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                    logger.info("Cached visa types list")
                 serializer = DetailedVisaTypeSerializer(visa_types, many=True, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
@@ -102,17 +140,31 @@ class CountryVisaTypesView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            country = Country.objects.filter(id=id, active=True).prefetch_related(
-                'types'
-            ).first()
+            country_cache_key = f"country:{id}"
+            country = cache.get(country_cache_key)
+            if country is not None:
+                logger.info("Serving country %s from cache (country lookup)", id)
+            if country is None:
+                country = Country.objects.filter(id=id, active=True).prefetch_related(
+                    'types'
+                ).first()
+                cache.set(country_cache_key, country, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                logger.info("Cached country %s (country lookup)", id)
             if not country:
                 return Response(
                     {"error": "Country not found"},
                     status=status.HTTP_404_NOT_FOUND
                 )
-            visa_types = country.types.filter(active=True).prefetch_related(
-                'processes', 'overviews', 'notes', 'required_documents'
-            )
+            visa_types_cache_key = f"country:{id}:visa_types"
+            visa_types = cache.get(visa_types_cache_key)
+            if visa_types is not None:
+                logger.info("Serving visa types for country %s from cache", id)
+            if visa_types is None:
+                visa_types = country.types.filter(active=True).prefetch_related(
+                    'processes', 'overviews', 'notes', 'required_documents'
+                )
+                cache.set(visa_types_cache_key, list(visa_types), getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                logger.info("Cached visa types for country %s", id)
             serializer = DetailedVisaTypeSerializer(visa_types, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
