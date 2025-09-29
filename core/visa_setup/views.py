@@ -112,11 +112,16 @@ class VisaTypeView(APIView):
                 if visa_types is not None:
                     logger.info("Serving visa types list from cache")
                 if visa_types is None:
-                    visa_types = VisaType.objects.filter(active=True).prefetch_related(
+                    visa_types_qs = VisaType.objects.filter(active=True).prefetch_related(
                         'processes', 'overviews', 'notes', 'required_documents'
                     )
-                    cache.set(cache_key, list(visa_types), getattr(settings, 'CACHE_DEFAULT_TTL', 300))
-                    logger.info("Cached visa types list")
+                    visa_types_list = list(visa_types_qs)
+                    cache.set(cache_key, visa_types_list, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                    for vt in visa_types_list:
+                        per_vt_key = f"visa_type:{vt.id}"
+                        cache.set(per_vt_key, vt, getattr(settings, 'CACHE_DEFAULT_TTL', 300))
+                    logger.info("Cached visa types list and hydrated %d visa type entries", len(visa_types_list))
+                    visa_types = visa_types_list
                 serializer = DetailedVisaTypeSerializer(visa_types, many=True, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Exception as e:
