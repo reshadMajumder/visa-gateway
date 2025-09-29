@@ -20,8 +20,9 @@ export async function generateStaticParams() {
   return allParams;
 }
 
-export default async function VisaTypeDetailPage({ params }: { params: { slug: string; visaType: string } }) {
-  const { country, visaType } = await getVisaTypeDetails(params.slug, params.visaType);
+export default async function VisaTypeDetailPage({ params }: { params: Promise<{ slug: string; visaType: string }> }) {
+  const { slug, visaType: visaTypeParam } = await params;
+  const { country, visaType } = await getVisaTypeDetails(slug, visaTypeParam);
 
   if (!country || !visaType) {
     notFound();

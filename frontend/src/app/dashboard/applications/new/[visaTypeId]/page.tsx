@@ -3,7 +3,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound, useSearchParams, useRouter } from 'next/navigation';
+import { notFound, useSearchParams, useRouter, useParams } from 'next/navigation';
 import { getVisaTypeDetails } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,9 +32,11 @@ type Country = {
     country: string;
 };
 
-export default function NewApplicationPage({ params }: { params: { visaTypeId: string } }) {
+export default function NewApplicationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const routeParams = useParams();
+  const visaTypeId = routeParams?.visaTypeId as string;
   const { toast } = useToast();
   
   const countryId = searchParams.get('countryId');
@@ -54,7 +56,8 @@ export default function NewApplicationPage({ params }: { params: { visaTypeId: s
     
     const fetchDetails = async () => {
       try {
-        const { country: fetchedCountry, visaType: fetchedVisaType } = await getVisaTypeDetails(countrySlug, params.visaTypeId);
+        if (!visaTypeId) return;
+        const { country: fetchedCountry, visaType: fetchedVisaType } = await getVisaTypeDetails(countrySlug, visaTypeId);
         if (fetchedCountry && fetchedVisaType) {
           const requiredDocsInfo = fetchedVisaType.info.find(i => i.title === 'Required Documents');
           const transformedVisaType = {
@@ -80,7 +83,7 @@ export default function NewApplicationPage({ params }: { params: { visaTypeId: s
     };
     
     fetchDetails();
-  }, [params.visaTypeId, countryId, countrySlug]);
+  }, [visaTypeId, countryId, countrySlug]);
 
   const handleFileChange = (documentId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

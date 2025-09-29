@@ -2,7 +2,7 @@
 'use client';
 
 import { getVisaBySlug, getVisas } from "@/lib/data";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { VisaDetailHero } from "@/components/visa-detail-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -12,14 +12,17 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 
-export default function VisaTypesPage({ params }: { params: { slug: string } }) {
+export default function VisaTypesPage() {
+  const routeParams = useParams();
+  const slug = routeParams?.slug as string;
   const [visa, setVisa] = useState<Awaited<ReturnType<typeof getVisaBySlug>> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchVisa() {
       try {
-        const visaData = await getVisaBySlug(params.slug);
+        if (!slug) return;
+        const visaData = await getVisaBySlug(slug);
         setVisa(visaData);
       } catch (error) {
         console.error("Failed to fetch visa data", error);
@@ -28,7 +31,7 @@ export default function VisaTypesPage({ params }: { params: { slug: string } }) 
       }
     }
     fetchVisa();
-  }, [params.slug]);
+  }, [slug]);
 
 
   if (isLoading) {

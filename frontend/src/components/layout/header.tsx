@@ -86,9 +86,9 @@ export function Header() {
         <div className="flex items-center justify-between h-24">
           <Link href="/" className="flex items-center gap-3">
             <Image src="/logo.png" alt="Schengen visa gateway logo" width={40} height={40} className="h-10 w-10 text-primary" />
-            <div className="font-headline font-bold text-foreground">
+            <div className="font-headline font-bold text-foreground flex flex-col leading-tight">
                 <span className="text-2xl">Schengen</span>
-                <span className="text-xl text-muted-foreground"> visa gateway</span>
+                <span className="text-xs text-muted-foreground">visa gateway</span>
             </div>
           </Link>
           <div className="flex items-center gap-4 text-sm font-medium">
