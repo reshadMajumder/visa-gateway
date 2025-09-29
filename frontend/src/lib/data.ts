@@ -215,21 +215,15 @@ export interface Application {
 }
 
 
-let visaDataCache: Visa[] | null = null;
-
 export const getVisas = async (): Promise<Visa[]> => {
-  if (visaDataCache) {
-    return Promise.resolve(visaDataCache);
-  }
   try {
-    const response = await fetch(`${API_BASE_URL}/api/countries/`);
+    const response = await fetch(`${API_BASE_URL}/api/countries/`, { cache: 'no-store' });
     if (!response.ok) {
       console.error("Failed to fetch visa data from API");
       return [];
     }
     const data = await response.json();
-    visaDataCache = data.map(mapApiDataToVisa);
-    return visaDataCache;
+    return data.map(mapApiDataToVisa);
   } catch (error) {
     console.error("Error fetching visa data:", error);
     return [];
@@ -242,7 +236,7 @@ export const getVisaBySlug = async (slug: string): Promise<Visa | undefined> => 
   if (!visaSummary) return undefined;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/countries/${visaSummary.id}/`);
+    const response = await fetch(`${API_BASE_URL}/api/countries/${visaSummary.id}/`, { cache: 'no-store' });
     if (!response.ok) {
       console.error(`Failed to fetch visa details for ${visaSummary.country}`);
       return visaSummary; // Return summary data if details fail
@@ -263,7 +257,7 @@ export const getCountryNames = async (): Promise<string[]> => {
 
 const getVisaTypeDetailsById = async (visaTypeId: string): Promise<any> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/visa-types/${visaTypeId}/`);
+        const response = await fetch(`${API_BASE_URL}/api/visa-types/${visaTypeId}/`, { cache: 'no-store' });
         if (!response.ok) {
             console.error(`Failed to fetch details for visa type ${visaTypeId}`);
             return null;
