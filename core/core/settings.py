@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'debug_toolbar',#delete after development
+    #delete after development
+    # 'debug_toolbar',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',  # <-- Added for blacklist support
     'visa_setup',
@@ -58,7 +59,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware', #delete after development
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware', #delete after development
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -66,9 +67,9 @@ MIDDLEWARE = [
 ]
 
 #delete after development
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+# INTERNAL_IPS = [
+#     "127.0.0.1",
+# ]
 
 
 ROOT_URLCONF = 'core.urls'
