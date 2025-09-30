@@ -534,12 +534,22 @@ class SettingsView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
+        cache_key = "settings"
+        cached = cache.get(cache_key)
+        if cached is not None:
+            logger.info("Serving settings from cache")
+            return Response(cached, status=status.HTTP_200_OK)
+
         try:
-            settings = Settings.objects.first()
-            if not settings:
+            site_settings = Settings.objects.first()
+            if not site_settings:
                 return Response({"error": "Settings not configured"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = SettingsSerializer(settings)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = SettingsSerializer(site_settings)
+            data = serializer.data
+            cache_timeout = getattr(settings, 'CACHE_DEFAULT_TTL', 300)
+            cache.set(cache_key, data, cache_timeout)
+            logger.info("Cached settings")
+            return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
